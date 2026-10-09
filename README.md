@@ -5,7 +5,7 @@ Como projeto, iremos desenvolver uma página web chamada "Gamebox", inspirada no
 
 ## Grupo
 - Gabriel Costa
-- Octávio Woellner
+- Octavio Woellner
 - Gustavo Hykavy
 - Henrique Pereira
 - Brayan Gomes
