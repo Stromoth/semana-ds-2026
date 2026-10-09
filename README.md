@@ -14,35 +14,35 @@ Como projeto, iremos desenvolver uma página web chamada "Gamebox", inspirada no
 
 ## Estrutura de pastas (ideia)
 
-gamebox/
-├── frontend/
-│   ├── index.html
-│   ├── pages/
-│   │   ├── login.html
-│   │   ├── biblioteca.html
-│   │   └── jogo.html
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       ├── api.js
-│       ├── auth.js
-│       ├── biblioteca.js
-│       └── jogo.js
-│
-├── backend/
-│   ├── src/
-│   │   ├── routes/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   ├── middleware/
-│   │   └── db/
-│   ├── .env
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js
-│
-├── database/
-│   └── schema.sql
-│
-├── .gitignore
-└── README.md
+gamebox/ 
+├── frontend/ 
+│   ├── index.html 
+│   ├── pages/ 
+│   │   ├── login.html 
+│   │   ├── biblioteca.html 
+│   │   └── jogo.html 
+│   ├── css/ 
+│   │   └── style.css 
+│   └── js/ 
+│       ├── api.js 
+│       ├── auth.js 
+│       ├── biblioteca.js  
+│       └── jogo.js 
+│ 
+├── backend/ 
+│   ├── src/ 
+│   │   ├── routes/ 
+│   │   ├── controllers/ 
+│   │   ├── services/ 
+│   │   ├── middleware/ 
+│   │   └── db/ 
+│   ├── .env 
+│   ├── .env.example 
+│   ├── package.json 
+│   └── server.js 
+│ 
+├── database/ 
+│   └── schema.sql 
+│ 
+├── .gitignore 
+└── README.md 
