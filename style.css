@@ -1,0 +1,173 @@
+/* =====================================================================
+   GAMEBOX — css/style.css (aparência)
+   Ligado a: index.html (<link rel="stylesheet" href="css/style.css">)
+   e a js/main.js. Comentários "JS:" marcam classes que o JavaScript
+   cria ou alterna; "HTML:" indica onde a classe é usada.
+   ===================================================================== */
+
+/* ---------- 1. Variáveis e base ---------- */
+:root{
+  --ink:#09121d; --deep:#0d1824; --panel:#142333; --panel2:#192b3b; --line:#2a4053;
+  --muted:#8295a4; --paper:#eaf1f5; --green:#39dc81; --orange:#ff853c; --electric:#6d75ff;
+}
+*{box-sizing:border-box}
+html{background:var(--ink)}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:"DM Sans",sans-serif}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+
+/* ---------- 2. Layout geral (HTML: .app-shell, .site-width) ---------- */
+.app-shell{width:100%;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:radial-gradient(circle at 84% 0%,#1d324b 0%,#0c1723 32%,#09121d 70%)}
+main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim da tela */
+.site-width{width:100%;max-width:1120px;margin:0 auto;padding:0 22px}
+.topline{border-top:2px solid #253b50}
+
+/* ---------- 3. Topo (HTML: <header class="topbar">) ---------- */
+.topbar{background:#0c1620;border-bottom:1px solid #203347}
+.brand-mark{display:grid;grid-template-columns:repeat(2,7px);gap:2px;width:17px;transform:rotate(45deg)}
+.brand-mark span{width:7px;height:7px;border-radius:2px}
+.brand-mark span:nth-child(1){background:#35d87c}
+.brand-mark span:nth-child(2){background:#53b7ff}
+.brand-mark span:nth-child(3){background:#ff8a3c}
+.brand-mark span:nth-child(4){background:#756dff}
+.brand-name{color:#f1f6f8;font-weight:700;font-size:15px;letter-spacing:.08rem}
+/* JS (showScreen): alterna .active em .nav-link e .selected em .view-switch button */
+.nav-link,.filter-button{background:transparent;border:0;color:#90a0ad;font-size:10px;font-weight:700;letter-spacing:.08em;transition:.18s}
+.nav-link:hover,.nav-link.active,.filter-button.active{color:#fff}
+.nav-link.active{border-bottom:2px solid var(--green);padding-bottom:5px}
+.search-wrap{background:#17283a;border:1px solid #294157}
+.search-wrap input{width:132px;min-width:0;background:transparent;border:0;color:#fff;outline:0;font-size:11px}
+.view-switch{display:flex;overflow:hidden;border:1px solid #334d63;border-radius:3px;background:#0a131c}
+.view-switch button{border:0;background:transparent;color:#90a3ae;padding:6px 8px;display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em}
+.view-switch button.selected{background:#29465d;color:#fff}
+
+/* ---------- 4. Barra de filtros (HTML: .subbar) ----------
+   JS (buildPanels/render) cria .filter-option, .filter-actions, .filter-chip;
+   JS alterna .active no botão do filtro e .selected nas opções. */
+.subbar{background:#101e2b;border-bottom:1px solid #263e53}
+.filter-button{padding:15px 9px}
+.filter-button.active{box-shadow:inset 0 -2px 0 var(--electric)}
+.filter-menu-wrap{position:relative;flex:none}
+.filter-popover{position:absolute;z-index:30;top:calc(100% - 2px);left:0;min-width:205px;max-width:min(290px,calc(100vw - 28px));padding:10px;background:#132333;border:1px solid #38546a;border-radius:5px;box-shadow:0 14px 32px rgba(0,0,0,.48);white-space:normal}
+.filter-popover[hidden]{display:none} /* JS alterna o atributo hidden */
+.filter-option{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:8px 9px;border:0;border-radius:3px;background:transparent;color:#dce7ec;font-size:11px}
+.filter-option:hover,.filter-option:focus-visible,.filter-option.selected{background:#263e53;color:#fff}
+.filter-option input{accent-color:var(--green)}
+.filter-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:8px;padding-top:8px;border-top:1px solid #2a4053}
+.filter-action{border:1px solid #3a566c;background:#1b3042;color:#eaf1f5;border-radius:3px;padding:6px 9px;font-size:10px;font-weight:700}
+.filter-action.primary{background:var(--green);color:#09121d;border-color:var(--green)}
+.filter-chip{border:1px solid #3b596e;background:#1a3042;color:#eaf1f5;border-radius:999px;padding:4px 9px;font-size:10px}
+.filter-chip button{margin-left:5px;color:var(--green);border:0;background:none;font-weight:700}
+
+/* ---------- 5. Telas (HTML: #discover-view e #feed-view) ----------
+   JS (showScreen) coloca .active em apenas uma delas. */
+.page-view{display:none;animation:fadeUp .3s ease both}
+.page-view.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- 6. Títulos ---------- */
+.section-kicker{color:#90a1ad;font-family:"Space Mono",monospace;font-size:9px;font-weight:700;letter-spacing:.07em}
+.section-title{color:#edf4f6;font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.03em;font-weight:700}
+.section-title--xl{font-size:30px}
+.section-title--lg{font-size:23px}
+
+/* ---------- 7. Cards de jogos e carrossel ----------
+   JS (makeCard) cria cada <button class="poster-card game-card"> dentro de #poster-grid. */
+.poster-card{min-width:0;overflow:hidden;text-align:left;border:1px solid #38546a;border-radius:4px;background:#122131;transition:.2s}
+.poster-card:hover{transform:translateY(-5px);border-color:#819bb0;box-shadow:0 14px 28px rgba(0,0,0,.35)}
+.poster-card img{width:100%;height:208px;display:block;object-fit:cover;filter:saturate(.85) contrast(1.08)}
+.poster-card:hover img{filter:saturate(1.15) contrast(1.04)}
+.poster-body{display:block;padding:10px}
+.poster-title{display:block;color:#f0f5f7;font-size:12px;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-meta{color:#8499a7;font-size:9px;text-transform:uppercase}
+.poster-genre{display:block;margin-top:4px}
+.poster-stats{display:flex;justify-content:space-between;margin-top:4px}
+.green{color:var(--green)}
+.orange{color:var(--orange)}
+.arrow{width:35px;height:35px;border-radius:50%;border:1px solid #3d576c;background:#142536;color:#dfeaf0;display:grid;place-items:center;transition:.18s}
+.arrow:hover{background:#24425a;border-color:#809bb1}
+.arrow:disabled{opacity:.35;cursor:not-allowed}
+.empty-search{display:none;color:#a5b5bd;padding:24px 0;font-size:13px} /* JS (render) alterna display */
+.empty-search button{margin-top:10px;border:1px solid #3b596e;background:#1a3042;color:#eaf1f5;border-radius:3px;padding:8px 12px;font-size:11px;font-weight:700}
+
+/* ---------- 8. Faixa promocional (HTML: .promo) ---------- */
+.promo{position:relative;overflow:hidden;min-height:132px;border:1px solid #594133;background:#36231d}
+.promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.44}
+.promo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#12131b 5%,rgba(17,19,29,.74) 45%,rgba(20,12,29,.18))}
+.promo-content{position:relative;z-index:1}
+.promo-kicker{color:#ffd0ae}
+.promo-title{color:#fff;font-weight:700;font-size:22px;letter-spacing:-.025em}
+.promo-description{color:#e7edf3;font-size:12px;margin-top:4px;max-width:28rem}
+.orange-btn{border:0;background:var(--orange);color:#17171b;padding:10px 14px;font-size:10px;font-weight:800;letter-spacing:.08em;transition:.18s}
+.orange-btn:not(:disabled):hover{background:#ffad74;transform:translateY(-1px)}
+.orange-btn:disabled{opacity:.45;cursor:not-allowed} /* JS (updatePublishState) usa o atributo disabled */
+
+/* ---------- 9. Avaliados recentemente e barra lateral ---------- */
+.recent-strip{border-top:1px solid #273f55;background:#0d1925}
+.mini-poster{width:48px;height:68px;object-fit:cover;border:1px solid #3b596e;transition:.18s}
+.mini-poster:hover{transform:translateY(-3px);border-color:var(--electric)}
+.aside-panel{border-top:1px solid #39546a;padding-top:12px}
+.pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.pick-grid img{width:100%;aspect-ratio:.72;object-fit:cover;border:1px solid #3b586b;transition:.18s}
+.pick-grid img:hover{transform:scale(1.04);border-color:var(--electric)}
+.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #567086}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #0d1925}
+.member-name{color:#e5eef2;font-weight:600;font-size:12px}
+
+/* ---------- 10. Feed de avaliações (HTML: #feed-view) ----------
+   JS (buildReview) cria <article class="review-card demo-review"> usando estas mesmas classes. */
+.review-card{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:17px 0;border-bottom:1px solid #263d51}
+.review-poster{width:76px;height:98px;object-fit:cover;border:1px solid #486278}
+.review-heading{font-size:16px;font-weight:700;color:#f2f7f9}
+.review-meta{font-size:11px;color:#91a2ad}
+.review-copy{max-width:650px;color:#b6c4cb;font-size:13px;line-height:1.52}
+.stars{color:var(--green);letter-spacing:1px;font-size:13px}
+.empty-star{color:#385568}
+.demo-review{animation:fadeUp .25s ease both}
+/* JS (delegação de cliques) alterna .liked e aria-pressed */
+.like-button{border:0;background:transparent;padding:2px;color:#99a9b2;font-size:11px;transition:.18s}
+.like-button:hover,.like-button.liked{color:var(--orange)}
+/* Formulário: JS alterna .selected nas estrelas do .rating-picker */
+.comment-box{background:#102030;border:1px solid #324f65;padding:14px}
+.comment-box textarea{width:100%;resize:vertical;min-height:64px;background:#0b1621;border:1px solid #2b455a;color:#eaf1f5;padding:9px;font-size:12px}
+.rating-picker button{background:transparent;border:0;padding:2px;color:#3c5769;font-size:17px}
+.rating-picker button.selected{color:var(--green)}
+
+/* Lista rolável de avaliações (HTML: #review-list). JS: buildReview/renderReviews preenchem a lista. */
+.review-scroll{max-height:min(620px,70vh);overflow-y:auto;padding-right:10px;margin-top:6px;scrollbar-width:thin;scrollbar-color:#3b596e #0d1925}
+.review-scroll::-webkit-scrollbar{width:8px}
+.review-scroll::-webkit-scrollbar-track{background:#0d1925;border-radius:4px}
+.review-scroll::-webkit-scrollbar-thumb{background:#3b596e;border-radius:4px}
+.review-scroll::-webkit-scrollbar-thumb:hover{background:#56768d}
+.review-scroll:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+
+/* ---------- Rodapé (HTML: <footer class="site-footer">) ---------- */
+.site-footer{border-top:1px solid #203347;background:#0c1620;padding:22px 0}
+.footer-links{display:flex;flex-wrap:wrap;gap:18px}
+.footer-link{background:transparent;border:0;padding:0;color:#90a0ad;font-size:10px;font-weight:700;letter-spacing:.08em;transition:.18s}
+.footer-link:hover{color:#fff}
+.footer-copy{margin:0;color:#6f8494;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.04em}
+
+/* ---------- 11. Responsivo ----------
+   O !important abaixo é necessário porque o Tailwind (grid-cols-4 no HTML)
+   é carregado depois e teria prioridade. */
+@media(max-width:760px){
+  .site-width{padding:0 14px}
+  .desktop-nav{display:none}
+  .subbar .site-width{overflow-x:auto}
+  .poster-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .poster-card img{height:176px}
+  .promo{min-height:158px}
+  .reviews-layout{grid-template-columns:1fr!important}
+  .side-column{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .search-wrap input{width:84px}
+  .review-card{grid-template-columns:58px 1fr}
+  .review-poster{width:58px;height:80px}
+}
+@media(max-width:480px){
+  .side-column{grid-template-columns:1fr}
+  .view-switch button span{display:none}
+  .promo-content{align-items:flex-start!important;flex-direction:column}
+  .poster-grid{gap:9px!important}
+}
