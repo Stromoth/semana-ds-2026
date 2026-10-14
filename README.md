@@ -12,7 +12,7 @@ Como projeto, iremos desenvolver uma página web chamada "Gamebox", inspirada no
 - Conrado Augusto
 - Kauê Alessandro
 
-## Estrutura de pastas
+## Estrutura de pastas proposta
 ```
 gamebox/ 
 ├── frontend/ 
