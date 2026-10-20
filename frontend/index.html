@@ -1,14 +1,17 @@
 <!doctype html>
 <!--
   GAMEBOX — index.html (estrutura/conteúdo)
+
   Arquivos ligados a este:
     • css/style.css → toda a aparência (cores, tamanhos, responsivo)
     • js/main.js    → todo o comportamento (telas, filtros, busca, carrossel, curtidas, formulário)
+
   Como as partes se conectam (procure pelos comentários "↔" nos três arquivos):
     • id="..."            → o JS encontra o elemento por esse id
     • data-screen-target  → o JS troca de tela (discover/feed) ao clicar
     • data-filter-panel   → o JS preenche as opções de filtro dentro dele
     • class="..."         → o CSS estiliza; algumas classes o JS também cria/alterna
+    
   O Tailwind (CDN) continua sendo usado só para utilitários rápidos (flex, gap, mt-3...).
 -->
 <html lang="pt-BR">
@@ -17,12 +20,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GameBox</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  
   <!-- ↔ CSS: aparência do site -->
   <link rel="stylesheet" href="css/style.css">
+
   <!-- Bibliotecas externas: ícones (Lucide) e utilitários (Tailwind) -->
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 </head>
+
 <body class="topline">
   <div class="app-shell">
 
@@ -34,16 +40,19 @@
           <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
           <span class="brand-name">GAMEBOX</span>
         </button>
+
         <nav class="desktop-nav flex items-center gap-4" aria-label="Navegação principal">
           <!-- Botões sem data-screen-target ainda não têm página (ver "pendências") -->
           <button class="nav-link" type="button">ENTRAR</button>
           <button class="nav-link" type="button">CRIAR CONTA</button>
+
           <!-- ↔ JS (showScreen): a classe .active é alternada conforme a tela -->
           <button class="nav-link active" type="button" data-screen-target="discover">JOGOS</button>
           <button class="nav-link" type="button">LISTAS</button>
           <button class="nav-link" type="button">JOGADORES</button>
           <button class="nav-link" type="button">NOTÍCIAS</button>
         </nav>
+
         <div class="ml-auto flex items-center gap-3">
           <!-- ↔ JS (showScreen): alterna .selected entre os dois botões -->
           <div class="view-switch" aria-label="Alternar tela">
@@ -55,6 +64,7 @@
     </header>
 
     <main>
+
       <!-- ================= TELA 1: DESCOBRIR ================= -->
       <!-- ↔ JS (showScreen) liga/desliga a classe .active; ↔ CSS: .page-view -->
       <section id="discover-view" class="page-view active" aria-label="Descoberta de jogos">
@@ -63,36 +73,44 @@
         <div class="subbar">
           <div class="site-width flex items-center gap-1 whitespace-nowrap">
             <span class="section-kicker mr-2">NAVEGAR POR</span>
+
             <div class="filter-menu-wrap">
               <button id="filter-year" class="filter-button" type="button" aria-label="Filtrar por ano" aria-expanded="false" aria-haspopup="true">ANO</button>
               <div class="filter-popover" data-filter-panel="year" role="group" aria-label="Opções de ano" hidden></div>
             </div>
+
             <div class="filter-menu-wrap">
               <button id="filter-rating" class="filter-button" type="button" aria-label="Filtrar por nota" aria-expanded="false" aria-haspopup="true">NOTA</button>
               <div class="filter-popover" data-filter-panel="rating" role="group" aria-label="Opções de nota" hidden></div>
             </div>
+
             <div class="filter-menu-wrap">
               <button id="filter-popular" class="filter-button" type="button" aria-label="Ordenar popularidade" aria-expanded="false" aria-haspopup="true">POPULARIDADE</button>
               <div class="filter-popover" data-filter-panel="popular" role="group" aria-label="Opções de popularidade" hidden></div>
             </div>
+
             <div class="filter-menu-wrap">
               <button id="filter-genre" class="filter-button" type="button" aria-label="Filtrar por gênero" aria-expanded="false" aria-haspopup="true">GÊNERO</button>
               <div class="filter-popover" data-filter-panel="genre" role="group" aria-label="Opções de gênero" hidden></div>
             </div>
+
             <div class="filter-menu-wrap">
               <button id="filter-platform" class="filter-button" type="button" aria-label="Filtrar por plataforma" aria-expanded="false" aria-haspopup="true">PLATAFORMA</button>
               <div class="filter-popover" data-filter-panel="platform" role="group" aria-label="Opções de plataforma" hidden></div>
             </div>
+
             <div class="filter-menu-wrap">
               <button id="filter-other" class="filter-button" type="button" aria-label="Mais filtros" aria-expanded="false" aria-haspopup="true">OUTROS</button>
               <div class="filter-popover" data-filter-panel="other" role="group" aria-label="Outros filtros" hidden></div>
             </div>
+
             <!-- ↔ JS: único campo de busca; filtra os cards em tempo real -->
             <label class="ml-auto search-wrap flex items-center gap-2 px-2 py-1.5 rounded-sm" for="game-search">
               <i data-lucide="search" width="13" height="13" class="text-slate-400"></i>
               <input id="game-search" type="search" autocomplete="off" placeholder="ENCONTRAR UM JOGO">
             </label>
           </div>
+
           <!-- ↔ JS (render): desenha aqui os "chips" dos filtros ativos -->
           <div id="active-filter-chips" class="site-width flex flex-wrap gap-2 pb-2" aria-live="polite"></div>
         </div>
@@ -103,27 +121,34 @@
               <p class="section-kicker mb-1">EM ALTA NA COMUNIDADE</p>
               <h1 class="section-title section-title--xl">JOGOS POPULARES ESTA SEMANA</h1>
             </div>
+
             <!-- ↔ JS (render): texto "N JOGOS EM DESTAQUE" / "N RESULTADO(S)" -->
             <p id="filter-result" class="section-kicker" aria-live="polite"></p>
           </div>
+
           <div class="flex items-center gap-3">
             <!-- ↔ JS: setas do carrossel (página anterior/próxima) -->
             <button id="carousel-prev" type="button" class="arrow shrink-0" aria-label="Ver jogos anteriores"><i data-lucide="chevron-left" width="18"></i></button>
+           
             <!-- ↔ JS (render/makeCard): os cards de jogos são criados aqui a partir da lista GAMES -->
             <div id="poster-grid" class="grid grid-cols-4 gap-3 flex-1 poster-grid"></div>
+           
             <button id="carousel-next" type="button" class="arrow shrink-0" aria-label="Ver próximos jogos"><i data-lucide="chevron-right" width="18"></i></button>
           </div>
+
           <!-- ↔ JS (render): mostrado quando nenhum jogo combina com a busca/filtros -->
           <p id="empty-search" class="empty-search">Nenhum jogo encontrado.<br><button type="button" id="clear-filters-empty">Limpar filtros</button></p>
 
           <section class="promo mt-6" aria-label="Convite GameBox">
             <img loading="lazy" src="https://images.pexels.com/photos/18076559/pexels-photo-18076559.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1280" alt="Pessoa usando máscara reflexiva sob iluminação neon vibrante">
+           
             <div class="promo-content h-full px-6 py-5 flex items-center justify-between gap-5">
               <div>
                 <p class="section-kicker promo-kicker mb-1">SEU DIÁRIO DE JOGOS</p>
                 <h2 class="promo-title">JOGUE, AVALIE, COMPARTILHE</h2>
                 <p class="promo-description">Descubra sua próxima campanha favorita e acompanhe tudo o que a comunidade está jogando.</p>
               </div>
+             
               <button class="orange-btn shrink-0" type="button" data-screen-target="feed">EXPLORAR JOGOS</button>
             </div>
           </section>
@@ -134,6 +159,7 @@
             <div>
               <div class="flex justify-between items-center mb-3">
                 <h2 class="section-title section-title--lg">AVALIADOS RECENTEMENTE</h2>
+                
                 <span class="section-kicker">VER ATIVIDADE</span>
               </div>
               <div class="flex gap-2 overflow-hidden">
@@ -145,8 +171,10 @@
                 <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/18419510/pexels-photo-18419510.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Paisagem digital futurista com blocos iluminados">
               </div>
             </div>
+           
             <aside>
               <h2 class="section-title section-title--lg mb-3">NA SUA REDE</h2>
+              
               <div class="space-y-2 text-[11px] text-slate-400">
                 <p><span class="text-slate-200 font-semibold">marina.arcade</span> avaliou <span class="green">★★★★★</span></p>
                 <p><span class="text-slate-200 font-semibold">kai_mora</span> criou uma lista de RPGs</p>
@@ -165,6 +193,7 @@
               <p class="section-kicker mb-1">O QUE A COMUNIDADE ESTÁ JOGANDO</p>
               <h1 class="section-title section-title--xl">AVALIAÇÕES POPULARES ESTA SEMANA</h1>
             </div>
+          
             <div class="flex items-center gap-4">
               <span class="section-kicker">2.408.516 JOGOS AVALIADOS</span>
               <button class="filter-button active" type="button">MAIS RECENTES</button>
@@ -177,24 +206,32 @@
               <!-- ↔ JS (initReviewForm): valida, cria a avaliação e a insere em #review-list -->
               <form id="comment-form" class="comment-box" aria-label="Adicionar comentário demonstrativo">
                 <label class="section-kicker block mb-2" for="comment-input">COMPARTILHE UMA IMPRESSÃO</label>
+               
                 <div class="grid grid-cols-2 gap-2 mb-2">
                   <label class="sr-only" for="comment-game">Escolha um jogo</label>
+                
                   <!-- As opções de jogo são criadas pelo JS a partir da lista GAMES -->
                   <select id="comment-game" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs"><option value="">Escolha um jogo</option></select>
+                
                   <label class="sr-only" for="comment-platform">Escolha a plataforma</label>
+                
                   <select id="comment-platform" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs">
                     <option value="">Escolha a plataforma</option><option>PC</option><option>PlayStation</option><option>Xbox</option><option>Nintendo Switch</option><option>Mobile</option>
                   </select>
                 </div>
+               
                 <textarea id="comment-input" placeholder="Escreva uma impressão sobre um jogo..."></textarea>
+               
                 <div class="flex justify-between items-center gap-3 mt-2">
                   <!-- ↔ JS: data-score guarda a nota (1 a 5); .selected é alternada pelo JS -->
                   <div class="rating-picker" aria-label="Escolha uma avaliação de uma a cinco estrelas">
                     <button type="button" data-score="1" aria-label="1 estrela">★</button><button type="button" data-score="2" aria-label="2 estrelas">★</button><button type="button" data-score="3" aria-label="3 estrelas">★</button><button type="button" data-score="4" aria-label="4 estrelas">★</button><button type="button" data-score="5" aria-label="5 estrelas">★</button>
                   </div>
+                 
                   <!-- ↔ JS: fica disabled até o formulário estar completo; ↔ CSS: .orange-btn:disabled -->
                   <button id="publish-button" class="orange-btn" type="submit">PUBLICAR</button>
                 </div>
+               
                 <p id="comment-status" class="review-meta mt-2" aria-live="polite"></p>
               </form>
 
@@ -202,6 +239,7 @@
                    (js/main.js). Avaliações novas do formulário entram no topo.
                    ↔ CSS: .review-scroll limita a altura e cria a barra de rolagem. -->
               <div id="review-list" class="review-scroll" tabindex="0" role="region" aria-label="Lista de avaliações"></div>
+             
               <button type="button" class="orange-btn mt-7" data-screen-target="discover">VOLTAR À DESCOBERTA</button>
             </section>
 
@@ -211,6 +249,7 @@
                   <h2 class="section-title section-title--lg">ESCOLHAS DA EQUIPE</h2>
                   <span class="section-kicker">MAIS</span>
                 </div>
+               
                 <div class="pick-grid">
                   <img loading="lazy" src="https://images.pexels.com/photos/8108092/pexels-photo-8108092.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Figura futurista iluminada por neon">
                   <img loading="lazy" src="https://images.pexels.com/photos/8193927/pexels-photo-8193927.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Picos nevados sob céu dramático">
@@ -220,21 +259,26 @@
                   <img loading="lazy" src="https://images.pexels.com/photos/18545016/pexels-photo-18545016.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Cidade digital iluminada por neon vermelho">
                 </div>
               </section>
+            
               <section class="aside-panel mt-7">
                 <h2 class="section-title section-title--lg mb-3">JOGADORES ATIVOS</h2>
+             
                 <div class="space-y-3">
                   <div class="flex items-center gap-3">
                     <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Homem sorrindo em retrato casual"><span class="online-dot absolute bottom-0 right-0"></span></div>
                     <span class="member-name">rafael.quest</span>
                   </div>
+              
                   <div class="flex items-center gap-3">
                     <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Mulher sorrindo em retrato natural"><span class="online-dot absolute bottom-0 right-0"></span></div>
                     <span class="member-name">bia.combo</span>
                   </div>
+             
                   <div class="flex items-center gap-3">
                     <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Homem com barba em retrato fechado"><span class="online-dot absolute bottom-0 right-0"></span></div>
                     <span class="member-name">vinilbyte</span>
                   </div>
+             
                   <div class="flex items-center gap-3">
                     <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Mulher usando óculos em uma rua urbana"><span class="online-dot absolute bottom-0 right-0"></span></div>
                     <span class="member-name">iris.level</span>
@@ -256,12 +300,14 @@
           <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
           <span class="brand-name">GAMEBOX</span>
         </div>
+     
         <nav class="footer-links" aria-label="Rodapé">
           <button class="footer-link" type="button">SOBRE</button>
           <button class="footer-link" type="button">AJUDA</button>
           <button class="footer-link" type="button">TERMOS</button>
           <button class="footer-link" type="button">PRIVACIDADE</button>
         </nav>
+      
         <p class="footer-copy">© 2026 GameBox · Projeto de demonstração</p>
       </div>
     </footer>
