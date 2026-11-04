@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "dev": "nodemon server.js",
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "connect-pg-simple": "^10.0.0",
+        "express-session": "^1.19.0"
+    }
+}
