@@ -11,7 +11,7 @@ function regenerarSessao(req) {
 
 async function register(req, res) {
     try {
-        const { nome, email, senha } req.body;
+        const { nome, email, senha } = req.body;
 
         if (
             typeof nome !== 'string' ||
@@ -28,7 +28,7 @@ async function register(req, res) {
 
         if (nomeLimpo.length < 2 || nomeLimpo.length > 100) {
             return res.status(400).json({
-                erro: 'O nome desse possuir entre 2 e 100 caracteres.'
+                erro: 'O nome deve possuir entre 2 e 100 caracteres.'
             });
         }
 
