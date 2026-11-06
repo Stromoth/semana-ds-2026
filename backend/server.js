@@ -6,6 +6,7 @@ const connectPgSimple = require('connect-pg-simple');
 
 const pool = require('./src/db/connection');
 const authRoutes = require('./src/routes/auth.routes');
+const libraryRoutes = require("./src/routes/library.routes");
 
 const gamesRoutes = require('./src/routes/games.routes');
 
@@ -41,6 +42,7 @@ app.use(session({
 
 app.use('/api/auth', authRoutes);
 app.use('/api/games', gamesRoutes);
+app.use("/api/library", libraryRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {
