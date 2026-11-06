@@ -7,6 +7,8 @@ const connectPgSimple = require('connect-pg-simple');
 const pool = require('./src/db/connection');
 const authRoutes = require('./src/routes/auth.routes');
 
+const gamesRoutes = require('./src/routes/games.routes');
+
 if (!process.env.SESSION_SECRET) {
     throw new Error ('SESSION_SECRET não configurado.');
 }
@@ -38,6 +40,7 @@ app.use(session({
 }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/games', gamesRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {
