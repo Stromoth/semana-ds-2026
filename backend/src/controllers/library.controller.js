@@ -9,7 +9,7 @@ const STATUS_VALIDOS = [
 ];
 
 async function adicionar(req, res) {
-    const rawgId = Number(req.body.rawg_id);
+    const rawgId = Number(req.body?.rawg_id);
 
     if (!Number.isSafeInteger(rawgId) || rawgId <= 0) {
         return res.status(400).json({
@@ -59,7 +59,7 @@ async function listar(req, res) {
 
 async function atualizarStatus(req, res) {
     const bibliotecaId = Number(req.params.id);
-    const { status } = req.body;
+    const { status } = req.body || {};
 
     if (!Number.isSafeInteger(bibliotecaId) || bibliotecaId <= 0) {
         return res.status(400).json({
@@ -86,7 +86,7 @@ async function atualizarStatus(req, res) {
             });
         }
 
-        return res.status(200).json;
+        return res.status(200).json(jogo);
     } catch (error) {
         console.error(error);
 
@@ -101,7 +101,7 @@ async function remover(req, res) {
 
     if (!Number.isSafeInteger(bibliotecaId) || bibliotecaId <= 0) {
         return res.status(400).json({
-            erro: 'ID da biblioteca invalido.'
+            erro: 'ID da biblioteca inválido.'
         });
     }
 

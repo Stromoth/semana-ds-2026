@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const path = require('node:path');
 const session = require('express-session');
 const connectPgSimple = require('connect-pg-simple');
 
@@ -10,8 +11,8 @@ const libraryRoutes = require("./src/routes/library.routes");
 
 const gamesRoutes = require('./src/routes/games.routes');
 
-if (!process.env.SESSION_SECRET) {
-    throw new Error ('SESSION_SECRET não configurado.');
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    throw new Error('Configure SESSION_SECRET com pelo menos 32 caracteres.');
 }
 
 const app = express();
@@ -24,6 +25,8 @@ const sessionStore = new PgSession({
     createTableIfMissing: true
 });
 
+app.set('trust proxy', process.env.NODE_ENV === 'production' ? 1 : false);
+
 app.use(express.json({ limit: '10kb' }));
 
 app.use(session({
@@ -34,7 +37,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: 1000 * 60 * 60 * 24
     }
@@ -64,6 +67,8 @@ app.get('/api/health', async (req, res) => {
     }
 });
 
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 app.use((req, res) => {
     res.status(404).json({
         erro: 'Rota não encontrada.'
@@ -72,6 +77,6 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Gamebox API: http://127.0.0.1${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Gamebox API disponível na porta ${PORT}.`);
 });

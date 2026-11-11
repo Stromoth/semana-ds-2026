@@ -67,7 +67,7 @@ async function listarBiblioteca(usuarioId) {
         [usuarioId]
     );
 
-    return results.rows;
+    return result.rows;
 }
 
 async function atualizarStatus(usuarioId, bibliotecaId, status) {

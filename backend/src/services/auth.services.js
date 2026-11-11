@@ -1,6 +1,6 @@
 const pool = require('../db/connection');
 
-const bcryp = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const SALT_ROUNDS = 12;
 

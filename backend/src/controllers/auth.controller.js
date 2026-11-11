@@ -1,4 +1,4 @@
-const authService = require('../services/auth.service');
+const authService = require('../services/auth.services');
 
 function regenerarSessao(req) {
     return new Promise((resolve, reject) => {
@@ -11,7 +11,7 @@ function regenerarSessao(req) {
 
 async function register(req, res) {
     try {
-        const { nome, email, senha } = req.body;
+        const { nome, email, senha } = req.body || {};
 
         if (
             typeof nome !== 'string' ||
@@ -57,7 +57,7 @@ async function register(req, res) {
 
         req.session.userId = usuario.id;
 
-        return rest.status(201).json({
+        return res.status(201).json({
             mensagem: 'Cadastro realizado com sucesso!',
             usuario
         });
@@ -79,7 +79,7 @@ async function register(req, res) {
 
 async function login(req, res) {
     try {
-        const { email, senha } = req.body;
+        const { email, senha } = req.body || {};
         
         if (
             typeof email !== "string" ||
