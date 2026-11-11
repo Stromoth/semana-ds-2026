@@ -63,6 +63,6 @@ gamebox/
 
 5. Abra `http://localhost:3000` para acessar o frontend e confira `http://localhost:3000/api/health` para verificar a API e o banco.
 
-A chave `RAWG_API_KEY` ainda não é necessária para iniciar o servidor nem para testar cadastro, login e banco. As rotas de jogos responderão com HTTP 503 até a chave ser configurada em `backend/.env`.
+A chave `RAWG_API_KEY` não é necessária para iniciar o servidor nem para usar cadastro, login, sessão ou consultar a biblioteca. As rotas de jogos responderão com HTTP 503 até a chave ser configurada em `backend/.env`.
 
-O frontend atual ainda é uma demonstração visual com dados locais; os formulários/páginas de login, jogo e biblioteca e a integração com a API ainda precisam ser implementados.
+O frontend já permite cadastrar e autenticar usuários, consultar a sessão e listar, alterar o status ou remover jogos da biblioteca. A busca, a inclusão e os detalhes dos jogos dependem da integração RAWG e permanecem indisponíveis enquanto a chave não estiver configurada. A página inicial e o feed de avaliações ainda usam dados demonstrativos.

@@ -42,10 +42,6 @@
         </button>
 
         <nav class="desktop-nav flex items-center gap-4" aria-label="Navegação principal">
-          <!-- Botões sem data-screen-target ainda não têm página (ver "pendências") -->
-          <button class="nav-link" type="button">ENTRAR</button>
-          <button class="nav-link" type="button">CRIAR CONTA</button>
-
           <!-- ↔ JS (showScreen): a classe .active é alternada conforme a tela -->
           <button class="nav-link active" type="button" data-screen-target="discover">JOGOS</button>
           <button class="nav-link" type="button">LISTAS</button>
@@ -54,6 +50,13 @@
         </nav>
 
         <div class="ml-auto flex items-center gap-3">
+          <div class="account-actions">
+            <a class="nav-link account-register" href="/pages/login.html?mode=register">CRIAR CONTA</a>
+            <a class="nav-link" data-account-login href="/pages/login.html">ENTRAR</a>
+            <a class="nav-link" data-account-library href="/pages/biblioteca.html" hidden>MINHA BIBLIOTECA</a>
+            <button class="nav-link" data-account-logout type="button" hidden>SAIR</button>
+            <span class="account-status" data-account-status role="status" aria-live="polite"></span>
+          </div>
           <!-- ↔ JS (showScreen): alterna .selected entre os dois botões -->
           <div class="view-switch" aria-label="Alternar tela">
             <button type="button" data-screen-target="discover" class="selected" aria-label="Tela de descoberta"><i data-lucide="compass" width="13" height="13"></i><span>DESCOBRIR</span></button>
@@ -315,5 +318,7 @@
 
   <!-- ↔ JS: carregado por último, quando todo o HTML acima já existe -->
   <script src="js/main.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/navigation.js"></script>
 </body>
 </html>

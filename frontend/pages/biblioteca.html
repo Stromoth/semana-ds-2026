@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Consulte e organize os jogos da sua biblioteca Gamebox.">
+  <title>Minha biblioteca · Gamebox</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="topline">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="site-width auth-topbar">
+        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">GAMEBOX</span>
+        </a>
+        <div class="library-topbar-actions">
+          <a class="nav-link" href="/">DESCOBRIR</a>
+          <button class="nav-link" id="library-logout" type="button">SAIR</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="library-main site-width">
+      <section aria-labelledby="library-title">
+        <p class="section-kicker">SEUS JOGOS, DO SEU JEITO</p>
+        <div class="library-heading">
+          <h1 class="section-title section-title--xl" id="library-title">MINHA BIBLIOTECA</h1>
+          <span id="library-count" class="section-kicker" aria-live="polite"></span>
+        </div>
+        <p class="library-notice">A busca e a inclusão de novos jogos estão temporariamente indisponíveis. Seus jogos existentes continuam acessíveis.</p>
+        <p id="library-status" class="form-status" role="status" aria-live="polite"></p>
+        <div id="library-list" class="library-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-width flex items-center justify-between gap-4">
+        <span class="brand-name">GAMEBOX</span>
+        <p class="footer-copy">© 2026 GameBox · Organize seus jogos</p>
+      </div>
+    </footer>
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/biblioteca.js"></script>
+</body>
+</html>

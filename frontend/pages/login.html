@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Entre ou crie sua conta Gamebox para organizar sua biblioteca de jogos.">
+  <title>Entrar ou criar conta · Gamebox</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="topline">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="site-width auth-topbar">
+        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">GAMEBOX</span>
+        </a>
+        <a class="nav-link" href="/">VOLTAR AOS JOGOS</a>
+      </div>
+    </header>
+
+    <main class="auth-main">
+      <section class="auth-panel" aria-labelledby="auth-title">
+        <p class="section-kicker">SUA PRÓXIMA FASE COMEÇA AQUI</p>
+        <h1 class="section-title section-title--xl" id="auth-title">ENTRAR</h1>
+        <p class="auth-intro" id="auth-intro">Acesse sua conta para cuidar da sua biblioteca.</p>
+
+        <div class="auth-tabs" role="group" aria-label="Escolha uma opção">
+          <button class="auth-tab active" type="button" data-auth-mode="login" aria-pressed="true">ENTRAR</button>
+          <button class="auth-tab" type="button" data-auth-mode="register" aria-pressed="false">CRIAR CONTA</button>
+        </div>
+
+        <form id="login-form" class="auth-form">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" maxlength="100" required>
+          <label for="login-password">Senha</label>
+          <input id="login-password" name="senha" type="password" autocomplete="current-password" required>
+          <button class="orange-btn auth-submit" type="submit">ENTRAR</button>
+        </form>
+
+        <form id="register-form" class="auth-form" hidden>
+          <label for="register-name">Nome</label>
+          <input id="register-name" name="nome" type="text" autocomplete="name" minlength="2" maxlength="100" required>
+          <label for="register-email">E-mail</label>
+          <input id="register-email" name="email" type="email" autocomplete="email" maxlength="100" required>
+          <label for="register-password">Senha <span class="field-hint">(mínimo de 8 caracteres)</span></label>
+          <input id="register-password" name="senha" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+          <button class="orange-btn auth-submit" type="submit">CRIAR CONTA</button>
+        </form>
+
+        <p id="auth-status" class="form-status" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-width flex items-center justify-between gap-4">
+        <span class="brand-name">GAMEBOX</span>
+        <p class="footer-copy">© 2026 GameBox · Organize seus jogos</p>
+      </div>
+    </footer>
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+</body>
+</html>
