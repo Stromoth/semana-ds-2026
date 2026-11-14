@@ -54,7 +54,20 @@
     }),
     logout: () => request("/api/auth/logout", { method: "POST" }),
     currentUser: () => request("/api/auth/me"),
+    searchGames: (search, page = 1, limit = 10) => {
+      const params = new URLSearchParams({
+        search,
+        page: String(page),
+        limit: String(limit)
+      });
+      return request(`/api/games?${params}`);
+    },
+    getGame: (id) => request(`/api/games/${encodeURIComponent(id)}`),
     listLibrary: () => request("/api/library"),
+    addToLibrary: (gamebrainId) => request("/api/library", {
+      method: "POST",
+      body: JSON.stringify({ gamebrain_id: gamebrainId })
+    }),
     updateLibraryStatus: (id, status) => request(`/api/library/${encodeURIComponent(id)}/status`, {
       method: "PATCH",
       body: JSON.stringify({ status })

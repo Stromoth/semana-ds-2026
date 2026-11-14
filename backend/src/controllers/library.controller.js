@@ -9,18 +9,18 @@ const STATUS_VALIDOS = [
 ];
 
 async function adicionar(req, res) {
-    const rawgId = Number(req.body?.rawg_id);
+    const gamebrainId = Number(req.body?.gamebrain_id);
 
-    if (!Number.isSafeInteger(rawgId) || rawgId <= 0) {
+    if (!Number.isSafeInteger(gamebrainId) || gamebrainId <= 0) {
         return res.status(400).json({
-            erro: 'Informe um Id válido do jogo.'
+            erro: 'Informe um ID GameBrain válido.'
         });
     }
 
     try {
         const jogo = await libraryService.adicionarJogo(
             req.usuario.id,
-            rawgId
+            gamebrainId
         );
 
         return res.status(201).json(jogo);

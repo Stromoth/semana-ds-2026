@@ -61,7 +61,8 @@ const SORTS = { // "Em alta" mantém a ordem original da lista (ranking da seman
   "Mais comentados": (a, b) => b.reviews - a.reviews,
   "Lançamentos recentes": (a, b) => b.year - a.year
 };
-const PAGE_SIZE = 4; // jogos por página do carrossel
+const PAGE_SIZE = 4;
+const API_PAGE_SIZE = 10;
 
 /* ---------- 2. UTILIDADES ---------- */
 const $ = id => document.getElementById(id);
@@ -99,13 +100,28 @@ document.addEventListener("click", event => {
 
 /* ---------- 4. BUSCA, FILTROS E CARROSSEL ----------
    Uma única fonte de verdade (state); render() redesenha tudo a partir dela. */
-const state = { query: "", year: "", rating: "", popular: "", genre: new Set(), platform: new Set(), other: new Set(), page: 0 };
+const state = {
+  query: "",
+  year: "",
+  rating: "",
+  popular: "",
+  genre: new Set(),
+  platform: new Set(),
+  other: new Set(),
+  page: 0,
+  remotePage: 1,
+  apiResults: null,
+  apiTotal: 0
+};
 const baseLabel = {}; // texto original de cada botão de filtro (lido do HTML)
+let searchTimer;
+let searchRequestId = 0;
 
 function getResults() {
   const q = norm(state.query.trim());
-  const list = GAMES.filter(g => {
-    if (q && !norm(g.title).includes(q) && !g.genres.some(x => norm(x).includes(q))) return false;
+  const source = state.apiResults === null ? GAMES : state.apiResults;
+  const list = source.filter(g => {
+    if (state.apiResults === null && q && !norm(g.title).includes(q) && !g.genres.some(x => norm(x).includes(q))) return false;
     if (state.year && String(g.year) !== state.year) return false;
     if (state.rating === "Sem avaliação" && g.rating !== null) return false;
     if (MIN_RATING[state.rating] && (g.rating === null || g.rating < MIN_RATING[state.rating])) return false;
@@ -117,21 +133,77 @@ function getResults() {
   return SORTS[state.popular] ? list.sort(SORTS[state.popular]) : list;
 }
 
+function mapGameBrainGame(game) {
+  const genres = Array.isArray(game.generos) ? game.generos : [];
+  const platforms = Array.isArray(game.plataformas) ? game.plataformas : [];
+  return {
+    id: game.gamebrain_id,
+    gamebrain_id: game.gamebrain_id,
+    title: game.titulo,
+    year: game.ano || (game.lancamento ? Number(String(game.lancamento).slice(0, 4)) : null),
+    genres,
+    platforms,
+    platformLabel: platforms.slice(0, 2).join(" / ") || "Plataforma não informada",
+    rating: game.nota,
+    votes: game.votos || 0,
+    reviews: 0,
+    features: [...(game.tags || []), ...(game.modos || [])],
+    image: game.capa_url,
+    alt: `Capa de ${game.titulo}`
+  };
+}
+
+function showAddMessage(container, message, loginRequired = false) {
+  container.replaceChildren(document.createTextNode(message));
+  if (loginRequired) {
+    const link = el("a", "game-card-login", "Entrar");
+    link.href = "/pages/login.html";
+    container.append(" ", link, " para adicionar jogos.");
+  }
+}
+
+async function addToLibrary(game, button, status) {
+  button.disabled = true;
+  status.textContent = "Adicionando à biblioteca…";
+  try {
+    await window.GameboxApi.addToLibrary(game.gamebrain_id);
+    showAddMessage(status, "Jogo adicionado à sua biblioteca.");
+    button.textContent = "ADICIONADO";
+    button.textContent = "ADICIONADO";
+  } catch (error) {
+    showAddMessage(status, error.message, error.status === 401);
+    button.disabled = error.status === 409;
+    if (error.status === 409) button.textContent = "JÁ NA BIBLIOTECA";
+    if (error.status !== 401 && error.status !== 409) button.disabled = false;
+  }
+}
+
 // Cria um card. ↔ CSS: .poster-card, .poster-title, .game-meta...
-// ↔ HTML/JS: data-screen-target="feed" faz o clique abrir o feed (futuramente: página do jogo)
 function makeCard(game) {
-  const card = el("button", "poster-card game-card");
-  card.type = "button";
+  const card = el("article", "poster-card game-card");
   card.dataset.gameId = game.id;
-  card.dataset.screenTarget = "feed";
   const image = el("img");
-  image.loading = "lazy"; image.src = game.image; image.alt = game.alt;
+  image.loading = "lazy";
+  image.alt = game.alt;
+  if (game.image) image.src = game.image;
+  else image.hidden = true;
   const votes = el("span");
   votes.append(el("span", "green", "●"), " " + formatVotes(game.votes));
   const stats = el("span", "game-meta poster-stats");
   stats.append(votes, el("span", "", "★ " + formatRating(game.rating)));
   const body = el("span", "poster-body");
-  body.append(el("span", "poster-title", game.title), el("span", "game-meta poster-genre", `${game.genres[0]} • ${game.platformLabel}`), stats);
+  const title = game.gamebrain_id ? el("a", "poster-title", game.title) : el("span", "poster-title", game.title);
+  if (game.gamebrain_id) title.href = `/pages/jogo.html?id=${encodeURIComponent(game.gamebrain_id)}`;
+  const genreLabel = game.genres[0] || "Gênero não informado";
+  body.append(title, el("span", "game-meta poster-genre", `${genreLabel} • ${game.platformLabel}`), stats);
+  if (game.gamebrain_id) {
+    const addButton = makeButton("ADICIONAR À BIBLIOTECA", "game-card-add", () => {
+      addToLibrary(game, addButton, addStatus);
+    });
+    const addStatus = el("span", "game-card-status");
+    addButton.setAttribute("aria-label", `Adicionar ${game.title} à biblioteca`);
+    body.append(addButton, addStatus);
+  }
   card.append(image, body);
   return card;
 }
@@ -144,7 +216,16 @@ function render() {
   // Cards (↔ HTML #poster-grid) e mensagem de vazio (↔ HTML #empty-search)
   $("poster-grid").replaceChildren(...results.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE).map(makeCard));
   $("empty-search").style.display = results.length ? "none" : "block";
-  $("carousel-prev").disabled = $("carousel-next").disabled = pages <= 1;
+  if (state.apiResults !== null) {
+    const remotePages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
+    $("carousel-prev").disabled = state.remotePage <= 1 && state.page <= 0;
+    $("carousel-next").disabled =
+      state.page < remotePages - 1
+        ? false
+        : state.remotePage >= 101 || state.remotePage * API_PAGE_SIZE >= state.apiTotal;
+  } else {
+    $("carousel-prev").disabled = $("carousel-next").disabled = pages <= 1;
+  }
 
   // Chips dos filtros ativos (↔ HTML #active-filter-chips)
   const active = [];
@@ -158,7 +239,12 @@ function render() {
   }));
 
   // Contador (↔ HTML #filter-result)
-  $("filter-result").textContent = state.query.trim() || active.length ? `${results.length} RESULTADO(S)` : `${results.length} JOGOS EM DESTAQUE`;
+  const resultCount = state.apiResults !== null && active.length === 0
+    ? state.apiTotal
+    : results.length;
+  $("filter-result").textContent = state.query.trim() || active.length
+    ? `${resultCount} RESULTADO(S)`
+    : `${results.length} JOGOS EM DESTAQUE`;
 
   // Texto/estado dos botões de filtro (↔ CSS .filter-button.active)
   Object.keys(OPTIONS).forEach(type => {
@@ -222,14 +308,64 @@ function closePanels() {
 }
 function resetFilters() {
   state.query = ""; state.year = state.rating = state.popular = ""; state.page = 0;
+  state.remotePage = 1;
+  state.apiResults = null;
+  state.apiTotal = 0;
+  searchRequestId++;
+  window.clearTimeout(searchTimer);
+  $("game-search-status").textContent = "";
   MULTI.forEach(type => state[type].clear());
   $("game-search").value = "";
   render();
 }
 function movePage(direction) {
+  if (state.apiResults !== null) {
+    const remotePages = Math.max(1, Math.ceil(getResults().length / PAGE_SIZE));
+    const nextLocalPage = state.page + direction;
+
+    if (nextLocalPage >= 0 && nextLocalPage < remotePages) {
+      state.page = nextLocalPage;
+      render();
+      return;
+    }
+
+    const nextRemotePage = state.remotePage + direction;
+    if (nextRemotePage < 1 || nextRemotePage > 101 || (nextRemotePage - 1) * API_PAGE_SIZE > 1000) return;
+    fetchGameBrainResults(state.query.trim(), nextRemotePage, direction < 0);
+    return;
+  }
   const pages = Math.max(1, Math.ceil(getResults().length / PAGE_SIZE));
   state.page = (state.page + direction + pages) % pages;
   render();
+}
+
+async function fetchGameBrainResults(query, page, showLastPage = false) {
+  const requestId = ++searchRequestId;
+  const status = $("game-search-status");
+  status.textContent = "Buscando jogos na GameBrain…";
+  state.apiResults = [];
+  state.apiTotal = 0;
+  state.remotePage = page;
+  state.page = 0;
+  render();
+
+  try {
+    const response = await window.GameboxApi.searchGames(query, page, API_PAGE_SIZE);
+    if (requestId !== searchRequestId) return;
+    state.apiResults = response.resultados.map(mapGameBrainGame);
+    state.apiTotal = response.total;
+    state.page = showLastPage
+      ? Math.max(0, Math.ceil(state.apiResults.length / PAGE_SIZE) - 1)
+      : 0;
+    status.textContent = "";
+    render();
+  } catch (error) {
+    if (requestId !== searchRequestId) return;
+    state.apiResults = [];
+    state.apiTotal = 0;
+    status.textContent = error.message;
+    render();
+  }
 }
 
 /* ---------- 5. CURTIDAS ----------
@@ -304,8 +440,32 @@ lucide.createIcons(); // transforma os <i data-lucide="..."> do HTML em ícones
 buildPanels();
 initReviewForm();
 
-// Busca (↔ HTML #game-search): filtra os cards enquanto digita
-$("game-search").addEventListener("input", event => { state.query = event.target.value; state.page = 0; render(); });
+// Busca os jogos reais com debounce para reduzir chamadas e consumo da cota da API.
+$("game-search").addEventListener("input", event => {
+  searchRequestId++;
+  state.query = event.target.value;
+  state.page = 0;
+  state.remotePage = 1;
+  window.clearTimeout(searchTimer);
+
+  const query = state.query.trim();
+  if (query.length < 2) {
+    searchRequestId++;
+    state.apiResults = null;
+    state.apiTotal = 0;
+    $("game-search-status").textContent = query
+      ? "Digite pelo menos 2 caracteres para pesquisar no catálogo."
+      : "";
+    render();
+    return;
+  }
+
+  state.apiResults = [];
+  state.apiTotal = 0;
+  $("game-search-status").textContent = "";
+  render();
+  searchTimer = window.setTimeout(() => fetchGameBrainResults(query, 1), 1000);
+});
 
 $("carousel-prev").addEventListener("click", () => movePage(-1));
 $("carousel-next").addEventListener("click", () => movePage(1));

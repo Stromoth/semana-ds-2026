@@ -18,7 +18,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GameBox</title>
+  <title>GameBox · Descubra jogos</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
   
   <!-- ↔ CSS: aparência do site -->
@@ -107,12 +107,13 @@
               <div class="filter-popover" data-filter-panel="other" role="group" aria-label="Outros filtros" hidden></div>
             </div>
 
-            <!-- ↔ JS: único campo de busca; filtra os cards em tempo real -->
+            <!-- ↔ JS: pesquisa o catálogo GameBrain após dois caracteres -->
             <label class="ml-auto search-wrap flex items-center gap-2 px-2 py-1.5 rounded-sm" for="game-search">
               <i data-lucide="search" width="13" height="13" class="text-slate-400"></i>
               <input id="game-search" type="search" autocomplete="off" placeholder="ENCONTRAR UM JOGO">
             </label>
           </div>
+          <p id="game-search-status" class="site-width api-search-status" role="status" aria-live="polite">Digite pelo menos 2 caracteres para pesquisar no catálogo GameBrain.</p>
 
           <!-- ↔ JS (render): desenha aqui os "chips" dos filtros ativos -->
           <div id="active-filter-chips" class="site-width flex flex-wrap gap-2 pb-2" aria-live="polite"></div>
@@ -121,8 +122,8 @@
         <div class="site-width py-8">
           <div class="flex items-end justify-between gap-3 mb-3">
             <div>
-              <p class="section-kicker mb-1">EM ALTA NA COMUNIDADE</p>
-              <h1 class="section-title section-title--xl">JOGOS POPULARES ESTA SEMANA</h1>
+              <p class="section-kicker mb-1">CATÁLOGO GAMEBRAIN · DESTAQUES INICIAIS DEMONSTRATIVOS</p>
+              <h1 class="section-title section-title--xl">BUSQUE SEU PRÓXIMO JOGO</h1>
             </div>
 
             <!-- ↔ JS (render): texto "N JOGOS EM DESTAQUE" / "N RESULTADO(S)" -->
@@ -311,7 +312,7 @@
           <button class="footer-link" type="button">PRIVACIDADE</button>
         </nav>
       
-        <p class="footer-copy">© 2026 GameBox · Projeto de demonstração</p>
+        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
       </div>
     </footer>
   </div>

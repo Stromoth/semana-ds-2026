@@ -1,8 +1,8 @@
 const pool = require('../db/connection');
-const rawgService = require('./rawg.service');
+const gamebrainService = require('./gamebrain.service');
 
-async function adicionarJogo(usuarioId, rawgId) {
-    const jogoRAWG = await rawgService.buscarJogoPorId(rawgId);
+async function adicionarJogo(usuarioId, gamebrainId) {
+    const jogoGameBrain = await gamebrainService.buscarJogoPorId(gamebrainId);
 
     const client = await pool.connect();
     
@@ -10,19 +10,19 @@ async function adicionarJogo(usuarioId, rawgId) {
         await client.query('BEGIN');
 
         const jogoResult = await client.query(
-            `INSERT INTO jogos (rawg_id, titulo, capa_url, lancamento)
+            `INSERT INTO jogos (gamebrain_id, titulo, capa_url, lancamento)
             VALUES ($1, $2, $3, $4)
-            ON CONFLICT (rawg_id)
+            ON CONFLICT (gamebrain_id)
             DO UPDATE SET
                 titulo = EXCLUDED.titulo,
                 capa_url = EXCLUDED.capa_url,
                 lancamento = EXCLUDED.lancamento
-            RETURNING id, rawg_id, titulo, capa_url, lancamento`,
+            RETURNING id, gamebrain_id, titulo, capa_url, lancamento`,
             [
-                jogoRAWG.rawg_id,
-                jogoRAWG.titulo,
-                jogoRAWG.capa_url,
-                jogoRAWG.lancamento || null
+                jogoGameBrain.gamebrain_id,
+                jogoGameBrain.titulo,
+                jogoGameBrain.capa_url,
+                jogoGameBrain.lancamento || null
             ]
         );
 
@@ -56,7 +56,7 @@ async function listarBiblioteca(usuarioId) {
             b.status,
             b.adicionado_em,
             j.id AS jogo_id,
-            j.rawg_id,
+            j.gamebrain_id,
             j.titulo,
             j.capa_url,
             j.lancamento

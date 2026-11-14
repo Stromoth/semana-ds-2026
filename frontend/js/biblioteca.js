@@ -123,7 +123,7 @@
     title.className = "section-title section-title--lg";
     title.textContent = "SUA BIBLIOTECA ESTÁ VAZIA";
     const description = document.createElement("p");
-    description.textContent = "Quando a integração de jogos estiver disponível, você poderá adicionar títulos à sua coleção.";
+    description.textContent = "Pesquise o catálogo GameBrain na página inicial e adicione seus jogos favoritos.";
     empty.append(title, description);
     list.replaceChildren(empty);
   }

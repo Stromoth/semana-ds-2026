@@ -43,6 +43,7 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .account-status{max-width:180px;color:#ff9b83;font-size:10px}
 .search-wrap{background:#17283a;border:1px solid #294157}
 .search-wrap input{width:132px;min-width:0;background:transparent;border:0;color:#fff;outline:0;font-size:11px}
+.api-search-status{min-height:18px;padding-top:5px;color:#ffb18e;font-size:11px}
 .view-switch{display:flex;overflow:hidden;border:1px solid #334d63;border-radius:3px;background:#0a131c}
 .view-switch button{border:0;background:transparent;color:#90a3ae;padding:6px 8px;display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.06em}
 .view-switch button.selected{background:#29465d;color:#fff}
@@ -82,12 +83,20 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .poster-card{min-width:0;overflow:hidden;text-align:left;border:1px solid #38546a;border-radius:4px;background:#122131;transition:.2s}
 .poster-card:hover{transform:translateY(-5px);border-color:#819bb0;box-shadow:0 14px 28px rgba(0,0,0,.35)}
 .poster-card img{width:100%;height:208px;display:block;object-fit:cover;filter:saturate(.85) contrast(1.08)}
+.poster-card img[hidden]{display:none}
 .poster-card:hover img{filter:saturate(1.15) contrast(1.04)}
 .poster-body{display:block;padding:10px}
 .poster-title{display:block;color:#f0f5f7;font-size:12px;font-weight:700;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .game-meta{color:#8499a7;font-size:9px;text-transform:uppercase}
 .poster-genre{display:block;margin-top:4px}
 .poster-stats{display:flex;justify-content:space-between;margin-top:4px}
+.game-card-add{width:100%;margin-top:10px;padding:8px 6px;border:1px solid #3b596e;border-radius:3px;background:#1a3042;color:#dce7ec;font-size:9px;font-weight:700;letter-spacing:.04em}
+.game-card-add:hover:not(:disabled){border-color:var(--green);color:#fff}
+.game-card-add:disabled{opacity:.55;cursor:default}
+.game-card-status{display:block;min-height:16px;margin-top:5px;color:var(--green);font-size:10px;line-height:1.4}
+.game-card-login{color:#fff;text-decoration:underline}
+.poster-title[href]{text-decoration:none}
+.poster-title[href]:hover{color:var(--green)}
 .green{color:var(--green)}
 .orange{color:var(--orange)}
 .arrow{width:35px;height:35px;border-radius:50%;border:1px solid #3d576c;background:#142536;color:#dfeaf0;display:grid;place-items:center;transition:.18s}
@@ -185,6 +194,17 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .library-empty{padding:34px 18px;border:1px dashed #3b596e;text-align:center}
 .library-empty p{margin:10px auto 0;max-width:480px;color:#a5b5bd;font-size:13px;line-height:1.55}
 .library-topbar-actions{display:flex;align-items:center;gap:18px}
+.game-detail-main{width:min(100%,900px);margin:0 auto;padding:48px 22px 64px}
+.game-detail-panel{display:grid;grid-template-columns:minmax(200px,320px) minmax(0,1fr);gap:28px;padding:22px;border:1px solid #2a4053;background:#102030}
+.game-detail-panel[hidden]{display:none}
+.game-detail-cover{width:100%;max-height:430px;object-fit:cover;background:#0b1621}
+.game-detail-content{min-width:0}
+.game-detail-title{margin:8px 0;color:#f0f5f7;font-family:"Space Mono",monospace;font-size:28px}
+.game-detail-description{color:#b6c4cb;font-size:14px;line-height:1.65;white-space:pre-line}
+.game-detail-meta{display:grid;gap:8px;margin:18px 0;color:#a5b5bd;font-size:12px}
+.game-detail-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.game-detail-link{color:#a5b5bd;font-size:11px}
+.game-detail-link:hover{color:#fff}
 
 /* ---------- Rodapé (HTML: <footer class="site-footer">) ---------- */
 .site-footer{border-top:1px solid #203347;background:#0c1620;padding:22px 0}
@@ -192,6 +212,8 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .footer-link{background:transparent;border:0;padding:0;color:#90a0ad;font-size:10px;font-weight:700;letter-spacing:.08em;transition:.18s}
 .footer-link:hover{color:#fff}
 .footer-copy{margin:0;color:#6f8494;font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.04em}
+.footer-copy a{color:inherit}
+.footer-copy a:hover{color:#fff}
 
 /* ---------- 11. Responsivo ----------
    O !important abaixo é necessário porque o Tailwind (grid-cols-4 no HTML)
@@ -228,4 +250,8 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
   .library-card-controls{align-items:stretch;flex-direction:column;gap:9px}
   .library-status-select{min-width:0}
   .library-topbar-actions{gap:10px}
+  .game-detail-main{padding:32px 14px 42px}
+  .game-detail-panel{grid-template-columns:1fr;gap:18px;padding:14px}
+  .game-detail-cover{max-height:360px}
+  .game-detail-title{font-size:22px}
 }

@@ -11,7 +11,7 @@ ON usuarios (LOWER(email));
 
 CREATE TABLE jogos (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    rawg_id INTEGER NOT NULL UNIQUE,
+    gamebrain_id INTEGER NOT NULL UNIQUE,
     titulo VARCHAR(255) NOT NULL,
     capa_url TEXT,
     lancamento DATE
