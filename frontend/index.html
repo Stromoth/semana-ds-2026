@@ -103,11 +103,11 @@
         <div class="site-width py-8">
           <div class="flex items-end justify-between gap-3 mb-3">
             <div>
-              <p class="section-kicker mb-1">CATÁLOGO GAMEBRAIN · DESTAQUES INICIAIS DEMONSTRATIVOS</p>
+              <p class="section-kicker mb-1">CATÁLOGO GAMEBRAIN · JOGOS ADICIONADOS PELA COMUNIDADE</p>
               <h1 class="section-title section-title--xl">BUSQUE SEU PRÓXIMO JOGO</h1>
             </div>
 
-            <!-- ↔ JS (render): texto "N JOGOS EM DESTAQUE" / "N RESULTADO(S)" -->
+            <!-- ↔ JS (render): quantidade real de jogos da comunidade ou resultados da busca -->
             <p id="filter-result" class="section-kicker" aria-live="polite"></p>
           </div>
 
@@ -115,18 +115,16 @@
             <!-- ↔ JS: setas do carrossel (página anterior/próxima) -->
             <button id="carousel-prev" type="button" class="arrow shrink-0" aria-label="Ver jogos anteriores"><i data-lucide="chevron-left" width="18"></i></button>
            
-            <!-- ↔ JS (render/makeCard): os cards de jogos são criados aqui a partir da lista GAMES -->
+            <!-- ↔ JS (render/makeCard): jogos da comunidade ou resultados reais da GameBrain -->
             <div id="poster-grid" class="grid grid-cols-4 gap-3 flex-1 poster-grid"></div>
            
             <button id="carousel-next" type="button" class="arrow shrink-0" aria-label="Ver próximos jogos"><i data-lucide="chevron-right" width="18"></i></button>
           </div>
 
           <!-- ↔ JS (render): mostrado quando nenhum jogo combina com a busca/filtros -->
-          <p id="empty-search" class="empty-search">Nenhum jogo encontrado.<br><button type="button" id="clear-filters-empty">Limpar filtros</button></p>
+          <div id="empty-search" class="empty-search"><span id="empty-search-text"></span><br><button type="button" id="clear-filters-empty" hidden>Limpar filtros</button></div>
 
           <section class="promo mt-6" aria-label="Convite GameBox">
-            <img loading="lazy" src="https://images.pexels.com/photos/18076559/pexels-photo-18076559.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1280" alt="Pessoa usando máscara reflexiva sob iluminação neon vibrante">
-           
             <div class="promo-content h-full px-6 py-5 flex items-center justify-between gap-5">
               <div>
                 <p class="section-kicker promo-kicker mb-1">SEU DIÁRIO DE JOGOS</p>
@@ -143,7 +141,7 @@
           <div class="site-width grid grid-cols-[1fr_220px] gap-8 max-md:grid-cols-1">
             <div>
               <div class="flex justify-between items-center mb-3">
-                <h2 class="section-title section-title--lg">AVALIADOS RECENTEMENTE</h2>
+                <h2 class="section-title section-title--lg">JOGOS COM ATIVIDADE RECENTE</h2>
                 
                 <span class="section-kicker">VER ATIVIDADE</span>
               </div>
@@ -236,47 +234,6 @@
                 </div>
               </section>
 
-              <section class="aside-panel" hidden>
-                <div class="flex justify-between items-center mb-3">
-                  <h2 class="section-title section-title--lg">ESCOLHAS DA EQUIPE</h2>
-                  <span class="section-kicker">MAIS</span>
-                </div>
-               
-                <div class="pick-grid">
-                  <img loading="lazy" src="https://images.pexels.com/photos/8108092/pexels-photo-8108092.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Figura futurista iluminada por neon">
-                  <img loading="lazy" src="https://images.pexels.com/photos/8193927/pexels-photo-8193927.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Picos nevados sob céu dramático">
-                  <img loading="lazy" src="https://images.pexels.com/photos/1224859/pexels-photo-1224859.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Corredor abandonado com grafites">
-                  <img loading="lazy" src="https://images.pexels.com/photos/1906658/pexels-photo-1906658.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Pessoa observando céu estrelado">
-                  <img loading="lazy" src="https://images.pexels.com/photos/16310035/pexels-photo-16310035.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Silhueta em floresta escura com contraluz">
-                  <img loading="lazy" src="https://images.pexels.com/photos/18545016/pexels-photo-18545016.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Cidade digital iluminada por neon vermelho">
-                </div>
-              </section>
-            
-              <section class="aside-panel mt-7" hidden>
-                <h2 class="section-title section-title--lg mb-3">JOGADORES ATIVOS</h2>
-             
-                <div class="space-y-3">
-                  <div class="flex items-center gap-3">
-                    <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Homem sorrindo em retrato casual"><span class="online-dot absolute bottom-0 right-0"></span></div>
-                    <span class="member-name">rafael.quest</span>
-                  </div>
-              
-                  <div class="flex items-center gap-3">
-                    <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Mulher sorrindo em retrato natural"><span class="online-dot absolute bottom-0 right-0"></span></div>
-                    <span class="member-name">bia.combo</span>
-                  </div>
-             
-                  <div class="flex items-center gap-3">
-                    <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Homem com barba em retrato fechado"><span class="online-dot absolute bottom-0 right-0"></span></div>
-                    <span class="member-name">vinilbyte</span>
-                  </div>
-             
-                  <div class="flex items-center gap-3">
-                    <div class="relative"><img class="avatar" loading="lazy" src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Mulher usando óculos em uma rua urbana"><span class="online-dot absolute bottom-0 right-0"></span></div>
-                    <span class="member-name">iris.level</span>
-                  </div>
-                </div>
-              </section>
             </aside>
           </div>
         </div>

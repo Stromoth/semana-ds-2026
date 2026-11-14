@@ -2,11 +2,14 @@ const { afterEach, test } = require('node:test');
 const assert = require('node:assert/strict');
 
 const gamebrainService = require('../src/services/gamebrain.service');
+const communityGamesService = require('../src/services/community-games.service');
 const gamesController = require('../src/controllers/games.controller');
 const originalPesquisarJogos = gamebrainService.pesquisarJogos;
+const originalListarDestaques = communityGamesService.listarDestaques;
 
 afterEach(() => {
     gamebrainService.pesquisarJogos = originalPesquisarJogos;
+    communityGamesService.listarDestaques = originalListarDestaques;
 });
 
 function criarResponse() {
@@ -65,6 +68,20 @@ test('usa lista vazia quando nenhum filtro é informado', async () => {
 
     assert.equal(res.statusCode, 200);
     assert.deepEqual(argumentos, ['zelda', 1, 10, []]);
+});
+
+test('retorna destaques reais da comunidade', async () => {
+    const destaques = {
+        total: 1,
+        resultados: [{ gamebrain_id: 123, titulo: 'Jogo da comunidade', jogadores: 2 }]
+    };
+    communityGamesService.listarDestaques = async () => destaques;
+    const res = criarResponse();
+
+    await gamesController.listarDestaques({}, res);
+
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(res.body, destaques);
 });
 
 test('rejeita filtros malformados e não chama o serviço', async (t) => {

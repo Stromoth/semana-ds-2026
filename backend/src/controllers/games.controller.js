@@ -1,4 +1,5 @@
 const gamebrainService = require('../services/gamebrain.service');
+const communityGamesService = require('../services/community-games.service');
 
 const FILTROS_PERMITIDOS = new Set(['genre', 'platform']);
 
@@ -130,7 +131,18 @@ async function buscarPorId(req, res) {
     }
 }
 
+async function listarDestaques(req, res) {
+    try {
+        const destaques = await communityGamesService.listarDestaques();
+        return res.status(200).json(destaques);
+    } catch (error) {
+        console.error('Erro ao consultar jogos da comunidade:', error);
+        return res.status(500).json({ erro: 'Erro ao consultar jogos da comunidade.' });
+    }
+}
+
 module.exports = {
     pesquisar,
-    buscarPorId
+    buscarPorId,
+    listarDestaques
 };

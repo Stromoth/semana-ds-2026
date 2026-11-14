@@ -64,6 +64,7 @@
       return request(`/api/games?${params}`);
     },
     getGame: (id) => request(`/api/games/${encodeURIComponent(id)}`),
+    listCommunityGames: () => request("/api/games/community"),
     listLibrary: () => request("/api/library"),
     addToLibrary: (gamebrainId) => request("/api/library", {
       method: "POST",

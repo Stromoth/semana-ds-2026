@@ -108,8 +108,7 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .empty-search button{margin-top:10px;border:1px solid #3b596e;background:#1a3042;color:#eaf1f5;border-radius:3px;padding:8px 12px;font-size:11px;font-weight:700}
 
 /* ---------- 8. Faixa promocional (HTML: .promo) ---------- */
-.promo{position:relative;overflow:hidden;min-height:132px;border:1px solid #594133;background:#36231d}
-.promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.44}
+.promo{position:relative;overflow:hidden;min-height:132px;border:1px solid #594133;background:radial-gradient(ellipse at 82% 18%,rgba(255,133,60,.34),transparent 42%),linear-gradient(120deg,#17283a,#30231f 72%,#162331)}
 .promo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#12131b 5%,rgba(17,19,29,.74) 45%,rgba(20,12,29,.18))}
 .promo-content{position:relative;z-index:1}
 .promo-kicker{color:#ffd0ae}
@@ -133,15 +132,8 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .network-activity-item a:hover{color:var(--green)}
 .review-sort{border:1px solid #334d63;border-radius:3px;background:#0a131c;color:#eaf1f5;padding:7px 9px;font-size:10px;font-weight:700;letter-spacing:.04em}
 .aside-panel{border-top:1px solid #39546a;padding-top:12px}
-.pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-.pick-grid img{width:100%;aspect-ratio:.72;object-fit:cover;border:1px solid #3b586b;transition:.18s}
-.pick-grid img:hover{transform:scale(1.04);border-color:var(--electric)}
-.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #567086}
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #0d1925}
-.member-name{color:#e5eef2;font-weight:600;font-size:12px}
 
-/* ---------- 10. Feed de avaliações (HTML: #feed-view) ----------
-   JS (buildReview) cria <article class="review-card demo-review"> usando estas mesmas classes. */
+/* ---------- 10. Feed de avaliações (HTML: #feed-view) ---------- */
 .review-card{display:grid;grid-template-columns:76px 1fr;gap:16px;padding:17px 0;border-bottom:1px solid #263d51}
 .review-poster{width:76px;height:98px;object-fit:cover;border:1px solid #486278}
 .review-heading{font-size:16px;font-weight:700;color:#f2f7f9}
@@ -150,7 +142,6 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .review-meta.error{color:#ff9b83}
 .stars{color:var(--green);letter-spacing:1px;font-size:13px}
 .empty-star{color:#385568}
-.demo-review{animation:fadeUp .25s ease both}
 /* JS (delegação de cliques) alterna .liked e aria-pressed */
 .like-button{border:0;background:transparent;padding:2px;color:#99a9b2;font-size:11px;transition:.18s}
 .like-button:hover,.like-button.liked{color:var(--orange)}

@@ -9,24 +9,7 @@
    ===================================================================== */
 "use strict";
 
-/* ---------- 1. DADOS ----------
-   Hoje os jogos vivem nesta lista. Quando houver banco de dados, basta
-   substituir GAMES pelo resultado de um fetch("/api/jogos") — o resto
-   do código lê tudo daqui. (Dados de demonstração.) */
-const pexels = (id, width = 800) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${width}`;
-
-const GAMES = [
-  { id: 1, title: "Neon Divide", year: 2026, genres: ["Ação", "Aventura"], platforms: ["PC", "PlayStation", "Xbox"], platformLabel: "PC / Console", rating: 4.6, votes: 28000, reviews: 1240, features: ["Modo single-player", "Com história"], image: pexels(17195067), alt: "Beco urbano vibrante iluminado por luzes neon" },
-  { id: 2, title: "Ashfall Protocol", year: 2025, genres: ["Sobrevivência", "Terror"], platforms: ["PC"], platformLabel: "PC", rating: 4.3, votes: 19000, reviews: 860, features: ["Modo single-player", "Cooperativo"], image: pexels(8079178), alt: "Explosão de fogo em cenário noturno dramático" },
-  { id: 3, title: "Skyforge Zero", year: 2026, genres: ["RPG", "Aventura"], platforms: ["PlayStation", "Xbox"], platformLabel: "Console", rating: 4.7, votes: 25000, reviews: 1010, features: ["Modo single-player", "Com história"], image: pexels(7672020), alt: "Astronauta operando painel em nave espacial com luz azul" },
-  { id: 4, title: "Driftline", year: 2025, genres: ["Corrida"], platforms: ["PC", "PlayStation", "Xbox", "Nintendo Switch"], platformLabel: "Multiplataforma", rating: 4.2, votes: 12000, reviews: 540, features: ["Multiplayer"], image: pexels(18833268), alt: "Carro amarelo em rua molhada durante a noite" },
-  { id: 5, title: "Umbra Vault", year: 2024, genres: ["Estratégia"], platforms: ["PC"], platformLabel: "PC", rating: 4.0, votes: 9000, reviews: 310, features: ["Modo single-player", "Multiplayer"], image: pexels(1224859), alt: "Corredor abandonado com grafites" },
-  { id: 6, title: "Tideborn", year: 2025, genres: ["Aventura", "Indie"], platforms: ["PlayStation", "Xbox", "Nintendo Switch"], platformLabel: "Console", rating: 4.4, votes: 15000, reviews: 620, features: ["Modo single-player", "Com história"], image: pexels(9314016), alt: "Ondas intensas sob céu de tempestade" },
-  { id: 7, title: "Verdant Echo", year: 2024, genres: ["Exploração", "Indie"], platforms: ["PC"], platformLabel: "PC", rating: 3.8, votes: 6000, reviews: 190, features: ["Modo single-player", "Jogo curto"], image: pexels(16310035), alt: "Silhueta em floresta escura com contraluz" },
-  { id: 8, title: "Iron Circuit", year: 2026, genres: ["Ação"], platforms: ["PC"], platformLabel: "Arcade", rating: null, votes: 800, reviews: 0, features: ["Multiplayer", "Acesso antecipado"], image: pexels(28833650), alt: "Figura com capacete em cenário escuro" }
-];
-
-/* Os valores dos filtros são fornecidos pela GameBrain para cada busca. */
+/* Os valores dos filtros e os resultados vêm do catálogo GameBrain. */
 const FILTERS = {
   genre: { label: "GÊNERO", options: [] },
   platform: { label: "PLATAFORMA", options: [] }
@@ -48,7 +31,6 @@ function makeButton(text, className, handler) {
   button.addEventListener("click", handler);
   return button;
 }
-const norm = text => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // busca sem acento
 const formatVotes = v => (v >= 1000 ? Math.round(v / 1000) + "K" : String(v));
 const formatRating = r => (r === null ? "—" : r.toFixed(1).replace(".", ","));
 
@@ -76,21 +58,17 @@ const state = {
   draftFilters: { genre: new Set(), platform: new Set() },
   page: 0,
   remotePage: 1,
-  apiResults: null,
-  apiTotal: 0
+  apiResults: [],
+  apiTotal: 0,
+  mode: "community"
 };
 let searchTimer;
 let searchRequestId = 0;
+let communityGames = [];
+let communityTotal = 0;
 
 function getResults() {
-  const q = norm(state.query.trim());
-  const source = state.apiResults === null ? GAMES : state.apiResults;
-  return source.filter(g =>
-    state.apiResults !== null ||
-    !q ||
-    norm(g.title).includes(q) ||
-    g.genres.some(x => norm(x).includes(q))
-  );
+  return state.apiResults;
 }
 
 function mapGameBrainGame(game) {
@@ -106,10 +84,27 @@ function mapGameBrainGame(game) {
     platformLabel: platforms.slice(0, 2).join(" / ") || "Plataforma não informada",
     rating: game.nota,
     votes: game.votos || 0,
-    reviews: 0,
     features: [...(game.tags || []), ...(game.modos || [])],
     image: game.capa_url,
     alt: `Capa de ${game.titulo}`
+  };
+}
+
+function mapCommunityGame(game) {
+  return {
+    id: game.gamebrain_id,
+    gamebrain_id: game.gamebrain_id,
+    title: game.titulo,
+    year: game.lancamento ? Number(String(game.lancamento).slice(0, 4)) : null,
+    genres: [],
+    platforms: [],
+    platformLabel: "",
+    rating: game.nota === null ? null : Number(game.nota),
+    votes: game.avaliacoes,
+    features: [],
+    image: game.capa_url,
+    alt: game.capa_url ? `Capa de ${game.titulo}` : "",
+    communityMembers: game.jogadores
   };
 }
 
@@ -148,14 +143,16 @@ function makeCard(game) {
   if (game.image) image.src = game.image;
   else image.hidden = true;
   const votes = el("span");
-  votes.append(el("span", "green", "●"), " " + formatVotes(game.votes));
+  votes.append(el("span", "green", "●"), " " + formatVotes(game.votes) + " votos");
   const stats = el("span", "game-meta poster-stats");
   stats.append(votes, el("span", "", "★ " + formatRating(game.rating)));
   const body = el("span", "poster-body");
   const title = game.gamebrain_id ? el("a", "poster-title", game.title) : el("span", "poster-title", game.title);
   if (game.gamebrain_id) title.href = `/pages/jogo.html?id=${encodeURIComponent(game.gamebrain_id)}`;
-  const genreLabel = game.genres[0] || "Gênero não informado";
-  body.append(title, el("span", "game-meta poster-genre", `${genreLabel} • ${game.platformLabel}`), stats);
+  const gameMeta = game.communityMembers === undefined
+    ? `${game.genres[0] || "Gênero não informado"} • ${game.platformLabel}`
+    : `${game.communityMembers} ${game.communityMembers === 1 ? "jogador" : "jogadores"} na biblioteca`;
+  body.append(title, el("span", "game-meta poster-genre", gameMeta), stats);
   if (game.gamebrain_id) {
     const addButton = makeButton("ADICIONAR À BIBLIOTECA", "game-card-add", () => {
       addToLibrary(game, addButton, addStatus);
@@ -176,7 +173,12 @@ function render() {
   // Cards (↔ HTML #poster-grid) e mensagem de vazio (↔ HTML #empty-search)
   $("poster-grid").replaceChildren(...results.slice(state.page * PAGE_SIZE, (state.page + 1) * PAGE_SIZE).map(makeCard));
   $("empty-search").style.display = results.length ? "none" : "block";
-  if (state.apiResults !== null) {
+  $("empty-search-text").textContent =
+    state.mode === "community"
+      ? "Ainda não há jogos nas bibliotecas da comunidade. Pesquise no catálogo acima e adicione um jogo à sua biblioteca para iniciar os destaques."
+      : "Nenhum jogo encontrado.";
+  $("clear-filters-empty").hidden = state.mode !== "search" || Boolean(results.length);
+  if (state.mode === "search") {
     const remotePages = Math.max(1, Math.ceil(results.length / PAGE_SIZE));
     $("carousel-prev").disabled = state.remotePage <= 1 && state.page <= 0;
     $("carousel-next").disabled =
@@ -203,10 +205,9 @@ function render() {
     return chip;
   }));
 
-  const resultCount = state.apiResults !== null ? state.apiTotal : results.length;
-  $("filter-result").textContent = state.query.trim() || active.length
-    ? `${resultCount} RESULTADO(S)`
-    : `${results.length} JOGOS EM DESTAQUE`;
+  $("filter-result").textContent = state.mode === "search"
+    ? `${state.apiTotal} RESULTADO(S)`
+    : `${state.apiTotal} JOGOS DA COMUNIDADE`;
   renderFilterPanels();
 }
 
@@ -280,7 +281,7 @@ function renderFilterPanels() {
     trigger.textContent = chosenCount
       ? `${filter.label} (${chosenCount})`
       : filter.label;
-    trigger.disabled = options.length === 0 || state.apiResults === null;
+    trigger.disabled = options.length === 0 || state.mode !== "search";
     trigger.classList.toggle("active", chosenCount > 0);
   });
 }
@@ -298,8 +299,9 @@ function resetFilters() {
   FILTERS.platform.options = [];
   state.page = 0;
   state.remotePage = 1;
-  state.apiResults = null;
-  state.apiTotal = 0;
+  state.mode = "community";
+  state.apiResults = communityGames;
+  state.apiTotal = communityTotal;
   searchRequestId++;
   window.clearTimeout(searchTimer);
   $("game-search-status").textContent = "";
@@ -307,7 +309,7 @@ function resetFilters() {
   render();
 }
 function movePage(direction) {
-  if (state.apiResults !== null) {
+  if (state.mode === "search") {
     const remotePages = Math.max(1, Math.ceil(getResults().length / PAGE_SIZE));
     const nextLocalPage = state.page + direction;
 
@@ -329,6 +331,7 @@ function movePage(direction) {
 
 async function fetchGameBrainResults(query, page, showLastPage = false) {
   const requestId = ++searchRequestId;
+  state.mode = "search";
   const status = $("game-search-status");
   closePanels();
   status.textContent = "Buscando jogos na GameBrain…";
@@ -541,6 +544,29 @@ async function loadActivities() {
     sidebar.replaceChildren(el("p", "form-status error", error.message));
     games.replaceChildren();
     feedSidebar.replaceChildren(el("p", "form-status error", error.message));
+  }
+}
+
+async function loadCommunityGames() {
+  $("game-search-status").textContent = "Carregando jogos da comunidade…";
+  try {
+    const response = await window.GameboxApi.listCommunityGames();
+    communityGames = response.resultados.map(mapCommunityGame);
+    communityTotal = response.total;
+    if (state.mode === "community" && !state.query.trim()) {
+      state.apiResults = communityGames;
+      state.apiTotal = communityTotal;
+      $("game-search-status").textContent = "";
+      render();
+    }
+  } catch (error) {
+    if (state.mode === "community" && !state.query.trim()) {
+      $("game-search-status").textContent = error.message;
+      $("poster-grid").replaceChildren();
+      $("filter-result").textContent = "";
+      $("empty-search-text").textContent = "Não foi possível carregar os jogos da comunidade.";
+      $("empty-search").style.display = "block";
+    }
   }
 }
 
@@ -779,7 +805,7 @@ loadActivities();
 loadFollowingActivities();
 initReviewForm().then(loadReviews);
 
-// Busca os jogos reais com debounce para reduzir chamadas e consumo da cota da API.
+// Pesquisa o catálogo GameBrain com debounce para reduzir chamadas e consumo da cota.
 $("game-search").addEventListener("input", event => {
   searchRequestId++;
   state.query = event.target.value;
@@ -796,8 +822,9 @@ $("game-search").addEventListener("input", event => {
   const query = state.query.trim();
   if (query.length < 2) {
     searchRequestId++;
-    state.apiResults = null;
-    state.apiTotal = 0;
+    state.mode = "community";
+    state.apiResults = communityGames;
+    state.apiTotal = communityTotal;
     $("game-search-status").textContent = query
       ? "Digite pelo menos 2 caracteres para pesquisar no catálogo."
       : "";
@@ -805,6 +832,7 @@ $("game-search").addEventListener("input", event => {
     return;
   }
 
+  state.mode = "search";
   state.apiResults = [];
   state.apiTotal = 0;
   $("game-search-status").textContent = "";
@@ -821,3 +849,4 @@ document.addEventListener("click", event => { if (!event.target.closest(".filter
 document.addEventListener("keydown", event => { if (event.key === "Escape") closePanels(); });
 
 render();
+loadCommunityGames();
