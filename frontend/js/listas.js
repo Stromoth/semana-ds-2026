@@ -301,24 +301,11 @@
     }
   });
 
-  $("lists-logout").addEventListener("click", async (event) => {
-    event.currentTarget.disabled = true;
-    try {
-      await window.GameboxApi.logout();
-      window.location.reload();
-    } catch (error) {
-      event.currentTarget.disabled = false;
-      showStatus(error.message, true);
-    }
-  });
-
   async function initialize() {
     try {
       const { usuario } = await window.GameboxApi.currentUser();
       signedIn = true;
       $("lists-user").textContent = `OLÁ, ${usuario.nome}`;
-      $("lists-login").hidden = true;
-      $("lists-logout").hidden = false;
       $("create-list-section").hidden = false;
       $("my-lists-section").hidden = false;
       library = await window.GameboxApi.listLibrary();

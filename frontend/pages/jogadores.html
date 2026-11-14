@@ -10,22 +10,7 @@
 </head>
 <body class="topline">
   <div class="app-shell">
-    <header class="topbar">
-      <div class="site-width auth-topbar">
-        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
-          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span class="brand-name">GAMEBOX</span>
-        </a>
-        <nav class="library-topbar-actions" aria-label="Navegação principal">
-          <a class="nav-link" href="/">DESCOBRIR</a>
-          <a class="nav-link" href="/pages/listas.html">LISTAS</a>
-          <a class="nav-link" href="/pages/biblioteca.html">BIBLIOTECA</a>
-          <a class="nav-link" id="players-login" href="/pages/login.html">ENTRAR</a>
-          <a class="nav-link" id="players-profile" href="#" hidden>MEU PERFIL</a>
-          <button class="nav-link" id="players-logout" type="button" hidden>SAIR</button>
-        </nav>
-      </div>
-    </header>
+    <header class="topbar" data-site-header></header>
 
     <main class="library-main site-width">
       <section aria-labelledby="players-title">
@@ -54,14 +39,11 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div class="site-width flex items-center justify-between gap-4">
-        <span class="brand-name">GAMEBOX</span>
-        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
-      </div>
-    </footer>
+    <footer class="site-footer" data-site-footer></footer>
   </div>
+  <script src="../js/site-shell.js"></script>
   <script src="../js/api.js"></script>
+  <script src="../js/navigation.js"></script>
   <script src="../js/jogadores.js"></script>
 </body>
 </html>

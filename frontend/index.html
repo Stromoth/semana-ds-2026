@@ -4,7 +4,8 @@
 
   Arquivos ligados a este:
     • css/style.css → toda a aparência (cores, tamanhos, responsivo)
-    • js/main.js    → todo o comportamento (telas, filtros, busca, carrossel, curtidas, formulário)
+    • js/site-shell.js → cabeçalho e rodapé compartilhados pelas páginas
+    • js/main.js    → comportamento da descoberta (telas, filtros, busca, avaliações)
 
   Como as partes se conectam (procure pelos comentários "↔" nos três arquivos):
     • id="..."            → o JS encontra o elemento por esse id
@@ -33,39 +34,7 @@
   <div class="app-shell">
 
     <!-- ================= TOPO ================= -->
-    <header class="topbar">
-      <div class="site-width flex items-center gap-6 py-3">
-        <!-- ↔ JS: data-screen-target="discover" volta para a tela de descoberta -->
-        <button type="button" class="flex items-center gap-3 shrink-0" aria-label="Ir para descoberta" data-screen-target="discover">
-          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span class="brand-name">GAMEBOX</span>
-        </button>
-
-        <nav class="desktop-nav flex items-center gap-4" aria-label="Navegação principal">
-          <!-- ↔ JS (showScreen): a classe .active é alternada conforme a tela -->
-          <button class="nav-link active" type="button" data-screen-target="discover">JOGOS</button>
-          <a class="nav-link" href="/pages/listas.html">LISTAS</a>
-          <a class="nav-link" href="/pages/jogadores.html">JOGADORES</a>
-          <button class="nav-link" type="button">NOTÍCIAS</button>
-        </nav>
-
-        <div class="ml-auto flex items-center gap-3">
-          <div class="account-actions">
-            <a class="nav-link account-register" href="/pages/login.html?mode=register">CRIAR CONTA</a>
-            <a class="nav-link" data-account-login href="/pages/login.html">ENTRAR</a>
-            <a class="nav-link" data-account-library href="/pages/biblioteca.html" hidden>MINHA BIBLIOTECA</a>
-            <a class="nav-link" data-account-profile href="#" hidden>MEU PERFIL</a>
-            <button class="nav-link" data-account-logout type="button" hidden>SAIR</button>
-            <span class="account-status" data-account-status role="status" aria-live="polite"></span>
-          </div>
-          <!-- ↔ JS (showScreen): alterna .selected entre os dois botões -->
-          <div class="view-switch" aria-label="Alternar tela">
-            <button type="button" data-screen-target="discover" class="selected" aria-label="Tela de descoberta"><i data-lucide="compass" width="13" height="13"></i><span>DESCOBRIR</span></button>
-            <button type="button" data-screen-target="feed" aria-label="Tela de avaliações"><i data-lucide="messages-square" width="13" height="13"></i><span>AVALIAÇÕES</span></button>
-          </div>
-        </div>
-      </div>
-    </header>
+    <header class="topbar" data-site-header></header>
 
     <main>
 
@@ -243,28 +212,13 @@
     <!-- ================= RODAPÉ =================
          ↔ CSS: .site-footer. O .app-shell é uma coluna com altura mínima da tela e o <main>
          ocupa o espaço que sobra, então o rodapé sempre fica colado no fim da página. -->
-    <footer class="site-footer">
-      <div class="site-width flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span class="brand-name">GAMEBOX</span>
-        </div>
-     
-        <nav class="footer-links" aria-label="Rodapé">
-          <button class="footer-link" type="button">SOBRE</button>
-          <button class="footer-link" type="button">AJUDA</button>
-          <button class="footer-link" type="button">TERMOS</button>
-          <button class="footer-link" type="button">PRIVACIDADE</button>
-        </nav>
-      
-        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
-      </div>
-    </footer>
+    <footer class="site-footer" data-site-footer></footer>
   </div>
 
   <!-- ↔ JS: carregado por último, quando todo o HTML acima já existe -->
+  <script src="js/site-shell.js"></script>
   <script src="js/api.js"></script>
-  <script src="js/main.js"></script>
   <script src="js/navigation.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

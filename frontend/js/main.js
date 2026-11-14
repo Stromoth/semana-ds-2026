@@ -704,9 +704,6 @@ async function initReviewForm() {
 
   try {
     const { usuario } = await window.GameboxApi.currentUser();
-    const profileLink = document.querySelector("[data-account-profile]");
-    profileLink.href = `/pages/perfil.html?id=${encodeURIComponent(usuario.id)}`;
-    profileLink.hidden = false;
     authNotice.hidden = true;
     form.hidden = false;
     const [library, mine] = await Promise.all([

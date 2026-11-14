@@ -4,7 +4,6 @@
   const list = document.getElementById("library-list");
   const statusMessage = document.getElementById("library-status");
   const count = document.getElementById("library-count");
-  const logoutButton = document.getElementById("library-logout");
   const statuses = [
     ["quero_jogar", "Quero jogar"],
     ["jogando", "Jogando"],
@@ -142,17 +141,6 @@
       showError(error);
     }
   }
-
-  logoutButton.addEventListener("click", async () => {
-    logoutButton.disabled = true;
-    try {
-      await window.GameboxApi.logout();
-      window.location.assign("/");
-    } catch (error) {
-      logoutButton.disabled = false;
-      showError(error);
-    }
-  });
 
   loadLibrary();
 })();

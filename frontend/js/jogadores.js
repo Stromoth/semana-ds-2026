@@ -103,27 +103,12 @@
     loadUsers();
   });
 
-  $("players-logout").addEventListener("click", async (event) => {
-    event.currentTarget.disabled = true;
-    try {
-      await window.GameboxApi.logout();
-      window.location.reload();
-    } catch (error) {
-      event.currentTarget.disabled = false;
-      showStatus(error.message, true);
-    }
-  });
-
   async function initialize() {
     try {
       const { usuario } = await window.GameboxApi.currentUser();
       signedIn = true;
       currentUserId = usuario.id;
       $("players-user").textContent = `OLÁ, ${usuario.nome}`;
-      $("players-login").hidden = true;
-      $("players-profile").href = `/pages/perfil.html?id=${encodeURIComponent(usuario.id)}`;
-      $("players-profile").hidden = false;
-      $("players-logout").hidden = false;
       $("following-section").hidden = false;
     } catch (error) {
       if (error.status !== 401) {
