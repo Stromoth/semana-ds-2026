@@ -46,6 +46,7 @@ async function listarAvaliacoes(ordenacao = 'recent', usuarioId = null) {
             a.texto,
             a.criada_em,
             a.atualizada_em,
+            u.id AS autor_id,
             u.nome AS autor,
             j.gamebrain_id,
             j.titulo,
@@ -56,7 +57,7 @@ async function listarAvaliacoes(ordenacao = 'recent', usuarioId = null) {
          INNER JOIN usuarios u ON u.id = a.usuario_id
          INNER JOIN jogos j ON j.id = a.jogo_id
          LEFT JOIN curtidas_avaliacoes c ON c.avaliacao_id = a.id
-         GROUP BY a.id, u.nome, j.gamebrain_id, j.titulo, j.capa_url
+         GROUP BY a.id, u.id, u.nome, j.gamebrain_id, j.titulo, j.capa_url
          ORDER BY ${orderBy}
          LIMIT 100`,
         [usuarioId]
@@ -153,6 +154,7 @@ async function listarAtividades(limite = 6) {
             a.tipo,
             a.detalhes,
             a.criada_em,
+            u.id AS autor_id,
             u.nome AS autor,
             j.gamebrain_id,
             j.titulo,

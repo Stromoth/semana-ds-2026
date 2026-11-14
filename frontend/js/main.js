@@ -399,7 +399,16 @@ function buildReview(review) {
   const headingText = el("div");
   const title = el("h2", "review-heading", review.titulo);
   const date = formatReviewDate(review.atualizada_em || review.criada_em);
-  const meta = el("p", "review-meta mt-1", `por ${review.autor || "Você"}${date ? ` · ${date}` : ""}`);
+  const meta = el("p", "review-meta mt-1");
+  meta.append("por ");
+  if (review.autor_id) {
+    const author = el("a", "profile-inline-link", review.autor || "Jogador");
+    author.href = `/pages/perfil.html?id=${encodeURIComponent(review.autor_id)}`;
+    meta.append(author);
+  } else {
+    meta.append(review.autor || "Você");
+  }
+  if (date) meta.append(` · ${date}`);
   const stars = el("span", "stars", `${"★".repeat(review.nota)}${"☆".repeat(5 - review.nota)}`);
   stars.setAttribute("aria-label", `${review.nota} de 5 estrelas`);
   headingText.append(title, meta);
@@ -503,7 +512,8 @@ async function loadActivities() {
       const item = el("p", "network-activity-item");
       const link = el("a", "", activity.titulo);
       link.href = `/pages/jogo.html?id=${encodeURIComponent(activity.gamebrain_id)}`;
-      const author = el("strong", "", activity.autor);
+      const author = el("a", "profile-inline-link", activity.autor);
+      author.href = `/pages/perfil.html?id=${encodeURIComponent(activity.autor_id)}`;
       item.append(author, ` ${describeActivity(activity)} `, link);
       sidebar.append(item);
       feedSidebar.append(item.cloneNode(true));
@@ -531,6 +541,50 @@ async function loadActivities() {
     sidebar.replaceChildren(el("p", "form-status error", error.message));
     games.replaceChildren();
     feedSidebar.replaceChildren(el("p", "form-status error", error.message));
+  }
+}
+
+async function loadFollowingActivities() {
+  const containers = [$("network-following-activity"), $("feed-following-activity")];
+  const renderMessage = (message, isError = false, loginLink = false) => {
+    for (const container of containers) {
+      const paragraph = el("p", isError ? "form-status error" : "review-meta", message);
+      if (loginLink) {
+        paragraph.append(" ", Object.assign(el("a", "", "Entre"), { href: "/pages/login.html" }),
+          " e siga jogadores para acompanhar a rede.");
+      }
+      container.replaceChildren(paragraph);
+    }
+  };
+
+  try {
+    const activities = await window.GameboxApi.listFollowingActivities();
+    if (!activities.length) {
+      renderMessage("Sua rede ainda não tem atividade. Encontre jogadores para acompanhar.", false);
+      for (const container of containers) {
+        container.lastElementChild.append(" ", Object.assign(el("a", "", "Encontrar jogadores"), {
+          href: "/pages/jogadores.html"
+        }), ".");
+      }
+      return;
+    }
+    for (const container of containers) {
+      container.replaceChildren(...activities.slice(0, 5).map(activity => {
+        const item = el("p", "network-activity-item");
+        const author = el("a", "profile-inline-link", activity.autor);
+        author.href = `/pages/perfil.html?id=${encodeURIComponent(activity.autor_id)}`;
+        const game = el("a", "", activity.titulo);
+        game.href = `/pages/jogo.html?id=${encodeURIComponent(activity.gamebrain_id)}`;
+        item.append(author, ` ${describeActivity(activity)} `, game);
+        return item;
+      }));
+    }
+  } catch (error) {
+    if (error.status === 401) {
+      renderMessage("Entre para acompanhar a atividade dos jogadores que segue.", false, true);
+    } else {
+      renderMessage(error.message, true);
+    }
   }
 }
 
@@ -624,6 +678,9 @@ async function initReviewForm() {
 
   try {
     const { usuario } = await window.GameboxApi.currentUser();
+    const profileLink = document.querySelector("[data-account-profile]");
+    profileLink.href = `/pages/perfil.html?id=${encodeURIComponent(usuario.id)}`;
+    profileLink.hidden = false;
     authNotice.hidden = true;
     form.hidden = false;
     const [library, mine] = await Promise.all([
@@ -719,6 +776,7 @@ async function initReviewForm() {
 lucide.createIcons(); // transforma os <i data-lucide="..."> do HTML em ícones
 buildPanels();
 loadActivities();
+loadFollowingActivities();
 initReviewForm().then(loadReviews);
 
 // Busca os jogos reais com debounce para reduzir chamadas e consumo da cota da API.

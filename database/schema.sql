@@ -9,6 +9,17 @@ CREATE TABLE usuarios (
 CREATE UNIQUE INDEX usuarios_email_unique
 ON usuarios (LOWER(email));
 
+CREATE TABLE usuarios_seguindo (
+    seguidor_id INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    seguido_id INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (seguidor_id, seguido_id),
+    CHECK (seguidor_id <> seguido_id)
+);
+
+CREATE INDEX usuarios_seguindo_seguido_idx
+ON usuarios_seguindo (seguido_id, seguidor_id);
+
 CREATE TABLE jogos (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     gamebrain_id INTEGER NOT NULL UNIQUE,

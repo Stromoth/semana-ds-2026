@@ -238,6 +238,29 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .list-game-card .library-cover{width:74px;height:96px}
 .list-game-content{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:8px}
 .list-game-content .library-game-title{font-size:14px}
+.player-search-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:22px;padding:16px;border:1px solid #2a4053;background:#102030}
+.player-search-form label{grid-column:1/-1;color:#90a1ad;font-family:"Space Mono",monospace;font-size:9px;font-weight:700;letter-spacing:.07em}
+.player-search-form input{width:100%;min-height:40px;padding:9px 11px;border:1px solid #2b455a;border-radius:3px;background:#0b1621;color:#eaf1f5}
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.player-card{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border:1px solid #2a4053;background:#102030}
+.player-card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
+.profile-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px}
+.profile-heading h1{margin:0}
+.profile-joined{margin:8px 0 0;color:#90a1ad;font-size:12px}
+.profile-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:22px}
+.profile-stats div{display:grid;gap:5px;padding:14px;border:1px solid #2a4053;background:#102030}
+.profile-stats strong{color:#f0f5f7;font-family:"Space Mono",monospace;font-size:22px}
+.profile-stats span{color:#90a1ad;font-family:"Space Mono",monospace;font-size:9px;font-weight:700}
+.profile-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:10px;margin-top:14px}
+.profile-game-card{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:12px;padding:11px;border:1px solid #2a4053;background:#102030}
+.profile-game-card .library-cover{width:64px;height:82px}
+.profile-game-card .game-detail-link{font-size:14px;font-weight:700;text-decoration:none}
+.profile-reviews{display:grid;gap:10px;margin-top:14px}
+.profile-review-card{padding:15px;border:1px solid #2a4053;background:#102030}
+.profile-review-heading{display:flex;justify-content:space-between;gap:12px}
+.profile-review-heading a{color:#f0f5f7;font-weight:700;text-decoration:none}
+.profile-review-heading a:hover,.profile-inline-link:hover{color:var(--green)}
+.profile-inline-link{color:#c8d6dd;text-decoration:none}
 .game-detail-main{width:min(100%,900px);margin:0 auto;padding:48px 22px 64px}
 .game-detail-panel{display:grid;grid-template-columns:minmax(200px,320px) minmax(0,1fr);gap:28px;padding:22px;border:1px solid #2a4053;background:#102030}
 .game-detail-panel[hidden]{display:none}
@@ -290,15 +313,22 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
   .library-heading{align-items:start;flex-direction:column}
   .library-heading .section-title{font-size:23px}
   .library-card{grid-template-columns:74px minmax(0,1fr);gap:12px;padding:10px}
-  .library-cover{width:74px;height:104px    .list-edit-form{grid-template-columns:1fr}
-    .list-edit-form .list-visibility,.list-edit-form button{grid-column:1}
-    .list-detail-heading{align-items:flex-start}
-  }
+  .library-cover{width:74px;height:104px}
+  .list-edit-form{grid-template-columns:1fr}
+  .list-edit-form .list-visibility,.list-edit-form button{grid-column:1}
+  .list-detail-heading{align-items:flex-start}
   .library-card-controls{align-items:stretch;flex-direction:column;gap:9px}
   .library-status-select{min-width:0}
   .library-topbar-actions{gap:10px}
+  .profile-heading{align-items:flex-start;flex-direction:column}
+  .profile-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .player-search-form{grid-template-columns:1fr}
+  .player-search-form label{grid-column:1}
   .game-detail-main{padding:32px 14px 42px}
   .game-detail-panel{grid-template-columns:1fr;gap:18px;padding:14px}
   .game-detail-cover{max-height:360px}
   .game-detail-title{font-size:22px}
+}
+@media(max-width:760px){
+  .profile-library{grid-template-columns:1fr}
 }

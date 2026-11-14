@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Encontre jogadores e acompanhe suas bibliotecas e avaliações na Gamebox.">
+  <title>Jogadores · Gamebox</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="topline">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="site-width auth-topbar">
+        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">GAMEBOX</span>
+        </a>
+        <nav class="library-topbar-actions" aria-label="Navegação principal">
+          <a class="nav-link" href="/">DESCOBRIR</a>
+          <a class="nav-link" href="/pages/listas.html">LISTAS</a>
+          <a class="nav-link" href="/pages/biblioteca.html">BIBLIOTECA</a>
+          <a class="nav-link" id="players-login" href="/pages/login.html">ENTRAR</a>
+          <a class="nav-link" id="players-profile" href="#" hidden>MEU PERFIL</a>
+          <button class="nav-link" id="players-logout" type="button" hidden>SAIR</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="library-main site-width">
+      <section aria-labelledby="players-title">
+        <p class="section-kicker">ENCONTRE SUA PRÓXIMA COMPANHIA DE JOGO</p>
+        <div class="library-heading">
+          <h1 class="section-title section-title--xl" id="players-title">JOGADORES</h1>
+          <span id="players-user" class="section-kicker"></span>
+        </div>
+        <p id="players-status" class="form-status" role="status" aria-live="polite"></p>
+
+        <form id="players-search-form" class="player-search-form">
+          <label for="players-search">BUSCAR POR NOME</label>
+          <input id="players-search" type="search" maxlength="100" placeholder="Digite o nome de um jogador">
+          <button class="orange-btn" type="submit">BUSCAR</button>
+        </form>
+
+        <section class="list-section" aria-labelledby="players-results-title">
+          <h2 class="section-title section-title--lg" id="players-results-title">COMUNIDADE</h2>
+          <div id="players-results" class="player-grid" aria-live="polite"></div>
+        </section>
+
+        <section id="following-section" class="list-section" hidden aria-labelledby="following-title">
+          <h2 class="section-title section-title--lg" id="following-title">SUA REDE</h2>
+          <div id="following-results" class="player-grid" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-width flex items-center justify-between gap-4">
+        <span class="brand-name">GAMEBOX</span>
+        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
+      </div>
+    </footer>
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/jogadores.js"></script>
+</body>
+</html>

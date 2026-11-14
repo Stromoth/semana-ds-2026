@@ -13,6 +13,7 @@ const gamesRoutes = require('./src/routes/games.routes');
 const reviewsRoutes = require('./src/routes/reviews.routes');
 const activitiesRoutes = require('./src/routes/activities.routes');
 const listsRoutes = require('./src/routes/lists.routes');
+const usersRoutes = require('./src/routes/users.routes');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
     throw new Error('Configure SESSION_SECRET com pelo menos 32 caracteres.');
@@ -52,6 +53,7 @@ app.use("/api/library", libraryRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/activities', activitiesRoutes);
 app.use('/api/lists', listsRoutes);
+app.use('/api/users', usersRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

@@ -78,6 +78,16 @@
     }),
     listReviews: (sort = "recent") => request(`/api/reviews?sort=${encodeURIComponent(sort)}`),
     listActivities: () => request("/api/activities"),
+    listFollowingActivities: () => request("/api/activities/following"),
+    listUsers: (search = "") => request(`/api/users?search=${encodeURIComponent(search)}`),
+    listFollowing: () => request("/api/users/following"),
+    getUserProfile: (id) => request(`/api/users/${encodeURIComponent(id)}`),
+    followUser: (id) => request(`/api/users/${encodeURIComponent(id)}/follow`, {
+      method: "POST"
+    }),
+    unfollowUser: (id) => request(`/api/users/${encodeURIComponent(id)}/follow`, {
+      method: "DELETE"
+    }),
     listMyReviews: () => request("/api/reviews/mine"),
     createReview: (gamebrainId, nota, texto) => request("/api/reviews", {
       method: "POST",

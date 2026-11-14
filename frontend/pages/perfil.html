@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Veja biblioteca, avaliações e rede de um jogador da Gamebox.">
+  <title>Perfil · Gamebox</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="topline">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="site-width auth-topbar">
+        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">GAMEBOX</span>
+        </a>
+        <nav class="library-topbar-actions" aria-label="Navegação principal">
+          <a class="nav-link" href="/">DESCOBRIR</a>
+          <a class="nav-link" href="/pages/jogadores.html">JOGADORES</a>
+          <a class="nav-link" href="/pages/listas.html">LISTAS</a>
+          <a class="nav-link" href="/pages/biblioteca.html">BIBLIOTECA</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="library-main site-width">
+      <section id="profile-content" hidden aria-labelledby="profile-name">
+        <p class="section-kicker">PERFIL DE JOGADOR</p>
+        <div class="profile-heading">
+          <div>
+            <h1 class="section-title section-title--xl" id="profile-name"></h1>
+            <p class="profile-joined" id="profile-joined"></p>
+          </div>
+          <button id="profile-follow" class="orange-btn" type="button" hidden></button>
+        </div>
+        <div class="profile-stats" aria-label="Estatísticas do perfil">
+          <div><strong id="profile-library-count">0</strong><span>JOGOS</span></div>
+          <div><strong id="profile-reviews-count">0</strong><span>AVALIAÇÕES</span></div>
+          <div><strong id="profile-followers-count">0</strong><span>SEGUIDORES</span></div>
+          <div><strong id="profile-following-count">0</strong><span>SEGUINDO</span></div>
+        </div>
+        <p id="profile-status" class="form-status" role="status" aria-live="polite"></p>
+
+        <section class="list-section" aria-labelledby="profile-library-title">
+          <h2 class="section-title section-title--lg" id="profile-library-title">BIBLIOTECA</h2>
+          <div id="profile-library" class="profile-library"></div>
+        </section>
+
+        <section class="list-section" aria-labelledby="profile-reviews-title">
+          <h2 class="section-title section-title--lg" id="profile-reviews-title">AVALIAÇÕES</h2>
+          <div id="profile-reviews" class="profile-reviews"></div>
+        </section>
+      </section>
+      <p id="profile-error" class="form-status" role="status" aria-live="polite">Carregando perfil…</p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-width flex items-center justify-between gap-4">
+        <span class="brand-name">GAMEBOX</span>
+        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
+      </div>
+    </footer>
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/perfil.js"></script>
+</body>
+</html>

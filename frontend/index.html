@@ -45,7 +45,7 @@
           <!-- ↔ JS (showScreen): a classe .active é alternada conforme a tela -->
           <button class="nav-link active" type="button" data-screen-target="discover">JOGOS</button>
           <a class="nav-link" href="/pages/listas.html">LISTAS</a>
-          <button class="nav-link" type="button">JOGADORES</button>
+          <a class="nav-link" href="/pages/jogadores.html">JOGADORES</a>
           <button class="nav-link" type="button">NOTÍCIAS</button>
         </nav>
 
@@ -54,6 +54,7 @@
             <a class="nav-link account-register" href="/pages/login.html?mode=register">CRIAR CONTA</a>
             <a class="nav-link" data-account-login href="/pages/login.html">ENTRAR</a>
             <a class="nav-link" data-account-library href="/pages/biblioteca.html" hidden>MINHA BIBLIOTECA</a>
+            <a class="nav-link" data-account-profile href="#" hidden>MEU PERFIL</a>
             <button class="nav-link" data-account-logout type="button" hidden>SAIR</button>
             <span class="account-status" data-account-status role="status" aria-live="polite"></span>
           </div>
@@ -157,6 +158,10 @@
               <div id="network-activity-list" class="network-activity-list" aria-live="polite">
                 <p class="review-meta">Carregando atividade…</p>
               </div>
+              <h2 class="section-title section-title--lg mt-6 mb-3">NA SUA REDE</h2>
+              <div id="network-following-activity" class="network-activity-list" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
+              </div>
             </aside>
           </div>
         </section>
@@ -223,6 +228,10 @@
               <section class="aside-panel">
                 <h2 class="section-title section-title--lg mb-3">ATIVIDADE RECENTE</h2>
                 <div id="feed-activity-list" class="network-activity-list" aria-live="polite">
+                  <p class="review-meta">Carregando atividade…</p>
+                </div>
+                <h2 class="section-title section-title--lg mt-6 mb-3">NA SUA REDE</h2>
+                <div id="feed-following-activity" class="network-activity-list" aria-live="polite">
                   <p class="review-meta">Carregando atividade…</p>
                 </div>
               </section>
