@@ -42,24 +42,10 @@ const REVIEWS = [
   { gameId: 8, author: "pedro.volt", platform: "PC", rating: 3, likes: 9, text: "Promissor, mas ainda é acesso antecipado: faltam modos e o equilíbrio das partidas oscila. A base é ótima e vale acompanhar as atualizações." }
 ];
 
-/* Opções dos filtros. ↔ HTML: cada chave corresponde a <div data-filter-panel="chave">
-   e ao botão id="filter-chave". */
-const OPTIONS = {
-  year: ["Qualquer ano", ...[...new Set(GAMES.map(g => String(g.year)))].sort().reverse()],
-  rating: ["Qualquer nota", "4 estrelas ou mais", "3 estrelas ou mais", "2 estrelas ou mais", "Sem avaliação"],
-  popular: ["Mais populares", "Em alta", "Mais avaliados", "Mais comentados", "Lançamentos recentes"],
-  genre: ["Ação", "Aventura", "RPG", "Estratégia", "Corrida", "Terror", "Indie", "Simulação"],
-  platform: ["PC", "PlayStation", "Xbox", "Nintendo Switch", "Mobile"],
-  other: ["Modo single-player", "Multiplayer", "Cooperativo", "Com história", "Jogo curto", "Acesso antecipado"]
-};
-const MULTI = ["genre", "platform", "other"];                 // permitem marcar várias opções
-const RESET = { year: "Qualquer ano", rating: "Qualquer nota" }; // opção que limpa o filtro
-const MIN_RATING = { "4 estrelas ou mais": 4, "3 estrelas ou mais": 3, "2 estrelas ou mais": 2 };
-const SORTS = { // "Em alta" mantém a ordem original da lista (ranking da semana)
-  "Mais populares": (a, b) => b.votes - a.votes,
-  "Mais avaliados": (a, b) => (b.rating ?? -1) - (a.rating ?? -1),
-  "Mais comentados": (a, b) => b.reviews - a.reviews,
-  "Lançamentos recentes": (a, b) => b.year - a.year
+/* Os valores dos filtros são fornecidos pela GameBrain para cada busca. */
+const FILTERS = {
+  genre: { label: "GÊNERO", options: [] },
+  platform: { label: "PLATAFORMA", options: [] }
 };
 const PAGE_SIZE = 4;
 const API_PAGE_SIZE = 10;
@@ -102,35 +88,25 @@ document.addEventListener("click", event => {
    Uma única fonte de verdade (state); render() redesenha tudo a partir dela. */
 const state = {
   query: "",
-  year: "",
-  rating: "",
-  popular: "",
-  genre: new Set(),
-  platform: new Set(),
-  other: new Set(),
+  filters: { genre: new Set(), platform: new Set() },
+  draftFilters: { genre: new Set(), platform: new Set() },
   page: 0,
   remotePage: 1,
   apiResults: null,
   apiTotal: 0
 };
-const baseLabel = {}; // texto original de cada botão de filtro (lido do HTML)
 let searchTimer;
 let searchRequestId = 0;
 
 function getResults() {
   const q = norm(state.query.trim());
   const source = state.apiResults === null ? GAMES : state.apiResults;
-  const list = source.filter(g => {
-    if (state.apiResults === null && q && !norm(g.title).includes(q) && !g.genres.some(x => norm(x).includes(q))) return false;
-    if (state.year && String(g.year) !== state.year) return false;
-    if (state.rating === "Sem avaliação" && g.rating !== null) return false;
-    if (MIN_RATING[state.rating] && (g.rating === null || g.rating < MIN_RATING[state.rating])) return false;
-    if (state.genre.size && !g.genres.some(x => state.genre.has(x))) return false;
-    if (state.platform.size && !g.platforms.some(x => state.platform.has(x))) return false;
-    if (state.other.size && !g.features.some(x => state.other.has(x))) return false;
-    return true;
-  });
-  return SORTS[state.popular] ? list.sort(SORTS[state.popular]) : list;
+  return source.filter(g =>
+    state.apiResults !== null ||
+    !q ||
+    norm(g.title).includes(q) ||
+    g.genres.some(x => norm(x).includes(q))
+  );
 }
 
 function mapGameBrainGame(game) {
@@ -227,73 +203,33 @@ function render() {
     $("carousel-prev").disabled = $("carousel-next").disabled = pages <= 1;
   }
 
-  // Chips dos filtros ativos (↔ HTML #active-filter-chips)
-  const active = [];
-  Object.keys(OPTIONS).forEach(type => MULTI.includes(type) ? state[type].forEach(v => active.push([type, v])) : state[type] && active.push([type, state[type]]));
+  const active = Object.entries(state.filters)
+    .flatMap(([type, values]) => [...values].map(value => [type, value]));
   $("active-filter-chips").replaceChildren(...active.map(([type, value]) => {
-    const chip = el("span", "filter-chip", value);
-    const remove = makeButton("×", "", () => { MULTI.includes(type) ? state[type].delete(value) : (state[type] = ""); state.page = 0; render(); });
+    const option = FILTERS[type].options.find(item => item.key === value);
+    const chip = el("span", "filter-chip", option?.name || value);
+    const remove = makeButton("×", "", () => {
+      state.filters[type].delete(value);
+      state.draftFilters[type].delete(value);
+      state.page = 0;
+      fetchGameBrainResults(state.query.trim(), 1);
+    });
     remove.setAttribute("aria-label", "Remover filtro " + value);
     chip.append(remove);
     return chip;
   }));
 
-  // Contador (↔ HTML #filter-result)
-  const resultCount = state.apiResults !== null && active.length === 0
-    ? state.apiTotal
-    : results.length;
+  const resultCount = state.apiResults !== null ? state.apiTotal : results.length;
   $("filter-result").textContent = state.query.trim() || active.length
     ? `${resultCount} RESULTADO(S)`
     : `${results.length} JOGOS EM DESTAQUE`;
-
-  // Texto/estado dos botões de filtro (↔ CSS .filter-button.active)
-  Object.keys(OPTIONS).forEach(type => {
-    const multi = MULTI.includes(type);
-    const count = multi ? state[type].size : 0;
-    const trigger = $("filter-" + type);
-    trigger.textContent = !multi && state[type] ? state[type] : count ? `${baseLabel[type]} (${count})` : baseLabel[type];
-    trigger.classList.toggle("active", multi ? count > 0 : Boolean(state[type]));
-  });
-
-  // Marca as opções selecionadas dentro dos painéis (↔ CSS .filter-option.selected)
-  document.querySelectorAll(".filter-popover").forEach(panel => {
-    const type = panel.dataset.filterPanel;
-    if (MULTI.includes(type)) {
-      panel.querySelectorAll("input").forEach(box => { box.checked = state[type].has(box.value); box.closest("label").classList.toggle("selected", box.checked); });
-    } else {
-      panel.querySelectorAll("button.filter-option").forEach(b => b.classList.toggle("selected", state[type] ? state[type] === b.dataset.value : b.dataset.value === RESET[type]));
-    }
-  });
+  renderFilterPanels();
 }
 
-// Constrói as opções de cada painel. ↔ HTML: [data-filter-panel] e #filter-<tipo>
 function buildPanels() {
-  Object.entries(OPTIONS).forEach(([type, options]) => {
+  Object.keys(FILTERS).forEach(type => {
     const panel = document.querySelector(`[data-filter-panel="${type}"]`);
     const trigger = $("filter-" + type);
-    baseLabel[type] = trigger.textContent.trim();
-    options.forEach(option => {
-      if (MULTI.includes(type)) {
-        const label = el("label", "filter-option");
-        const box = el("input");
-        box.type = "checkbox"; box.value = option;
-        box.addEventListener("change", () => { box.checked ? state[type].add(option) : state[type].delete(option); state.page = 0; render(); });
-        label.append(box, option);
-        panel.append(label);
-      } else {
-        const button = makeButton(option, "filter-option", () => {
-          state[type] = option === RESET[type] || state[type] === option ? "" : option; // clicar de novo desmarca
-          state.page = 0; closePanels(); render();
-        });
-        button.dataset.value = option;
-        panel.append(button);
-      }
-    });
-    if (MULTI.includes(type)) {
-      const actions = el("div", "filter-actions");
-      actions.append(makeButton("Limpar", "filter-action", () => { state[type].clear(); state.page = 0; render(); }), makeButton("Aplicar", "filter-action primary", closePanels));
-      panel.append(actions);
-    }
     trigger.addEventListener("click", () => {
       const opening = panel.hidden;
       closePanels();
@@ -302,19 +238,87 @@ function buildPanels() {
     });
   });
 }
+
+function renderFilterPanels() {
+  Object.entries(FILTERS).forEach(([type, filter]) => {
+    const panel = document.querySelector(`[data-filter-panel="${type}"]`);
+    const trigger = $("filter-" + type);
+    const selected = state.filters[type];
+    const options = [...filter.options];
+
+    selected.forEach(key => {
+      if (!options.some(option => option.key === key)) {
+        options.push({ key, name: key, count: 0 });
+      }
+    });
+
+    panel.replaceChildren();
+    options.forEach(option => {
+      const label = el("label", "filter-option");
+      const checkbox = el("input");
+      checkbox.type = "checkbox";
+      checkbox.value = option.key;
+      checkbox.checked = state.draftFilters[type].has(option.key);
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) state.draftFilters[type].add(option.key);
+        else state.draftFilters[type].delete(option.key);
+        label.classList.toggle("selected", checkbox.checked);
+      });
+      label.classList.toggle("selected", checkbox.checked);
+      const optionCount = el("span", "filter-option-count", String(option.count));
+      label.append(checkbox, option.name, optionCount);
+      panel.append(label);
+    });
+
+    const actions = el("div", "filter-actions");
+    actions.append(
+      makeButton("Limpar", "filter-action", () => {
+        state.filters[type].clear();
+        state.draftFilters[type].clear();
+        state.page = 0;
+        closePanels();
+        fetchGameBrainResults(state.query.trim(), 1);
+      }),
+      makeButton("Aplicar", "filter-action primary", () => {
+        if (state.draftFilters[type].size > 5) {
+          $("game-search-status").textContent = "Selecione no máximo 5 opções por filtro.";
+          return;
+        }
+        state.filters[type] = new Set(state.draftFilters[type]);
+        state.page = 0;
+        closePanels();
+        fetchGameBrainResults(state.query.trim(), 1);
+      })
+    );
+    panel.append(actions);
+
+    const chosenCount = selected.size;
+    trigger.textContent = chosenCount
+      ? `${filter.label} (${chosenCount})`
+      : filter.label;
+    trigger.disabled = options.length === 0 || state.apiResults === null;
+    trigger.classList.toggle("active", chosenCount > 0);
+  });
+}
 function closePanels() {
   document.querySelectorAll(".filter-popover").forEach(panel => { panel.hidden = true; });
   document.querySelectorAll(".filter-menu-wrap > button").forEach(b => b.setAttribute("aria-expanded", "false"));
 }
 function resetFilters() {
-  state.query = ""; state.year = state.rating = state.popular = ""; state.page = 0;
+  state.query = "";
+  state.filters.genre.clear();
+  state.filters.platform.clear();
+  state.draftFilters.genre.clear();
+  state.draftFilters.platform.clear();
+  FILTERS.genre.options = [];
+  FILTERS.platform.options = [];
+  state.page = 0;
   state.remotePage = 1;
   state.apiResults = null;
   state.apiTotal = 0;
   searchRequestId++;
   window.clearTimeout(searchTimer);
   $("game-search-status").textContent = "";
-  MULTI.forEach(type => state[type].clear());
   $("game-search").value = "";
   render();
 }
@@ -342,7 +346,10 @@ function movePage(direction) {
 async function fetchGameBrainResults(query, page, showLastPage = false) {
   const requestId = ++searchRequestId;
   const status = $("game-search-status");
+  closePanels();
   status.textContent = "Buscando jogos na GameBrain…";
+  FILTERS.genre.options = [];
+  FILTERS.platform.options = [];
   state.apiResults = [];
   state.apiTotal = 0;
   state.remotePage = page;
@@ -350,10 +357,28 @@ async function fetchGameBrainResults(query, page, showLastPage = false) {
   render();
 
   try {
-    const response = await window.GameboxApi.searchGames(query, page, API_PAGE_SIZE);
+    const filters = Object.entries(state.filters)
+      .filter(([, values]) => values.size > 0)
+      .map(([key, values]) => ({
+        key,
+        values: [...values].map(value => ({ value })),
+        connection: "OR"
+      }));
+    const response = await window.GameboxApi.searchGames(query, page, API_PAGE_SIZE, filters);
     if (requestId !== searchRequestId) return;
     state.apiResults = response.resultados.map(mapGameBrainGame);
     state.apiTotal = response.total;
+    for (const filter of response.filtros || []) {
+      if (Object.hasOwn(FILTERS, filter.chave)) {
+        FILTERS[filter.chave].options = filter.opcoes.map(option => ({
+          key: option.chave,
+          name: option.nome,
+          count: option.total
+        }));
+      }
+    }
+    state.draftFilters.genre = new Set(state.filters.genre);
+    state.draftFilters.platform = new Set(state.filters.platform);
     state.page = showLastPage
       ? Math.max(0, Math.ceil(state.apiResults.length / PAGE_SIZE) - 1)
       : 0;
@@ -447,6 +472,12 @@ $("game-search").addEventListener("input", event => {
   state.page = 0;
   state.remotePage = 1;
   window.clearTimeout(searchTimer);
+  state.filters.genre.clear();
+  state.filters.platform.clear();
+  state.draftFilters.genre.clear();
+  state.draftFilters.platform.clear();
+  FILTERS.genre.options = [];
+  FILTERS.platform.options = [];
 
   const query = state.query.trim();
   if (query.length < 2) {

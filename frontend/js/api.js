@@ -54,11 +54,12 @@
     }),
     logout: () => request("/api/auth/logout", { method: "POST" }),
     currentUser: () => request("/api/auth/me"),
-    searchGames: (search, page = 1, limit = 10) => {
+    searchGames: (search, page = 1, limit = 10, filters = []) => {
       const params = new URLSearchParams({
         search,
         page: String(page),
-        limit: String(limit)
+        limit: String(limit),
+        filters: JSON.stringify(filters)
       });
       return request(`/api/games?${params}`);
     },

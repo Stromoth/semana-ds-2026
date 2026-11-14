@@ -1,5 +1,52 @@
 const gamebrainService = require('../services/gamebrain.service');
 
+const FILTROS_PERMITIDOS = new Set(['genre', 'platform']);
+
+function lerFiltros(valor) {
+    if (valor === undefined) {
+        return [];
+    }
+
+    if (typeof valor !== 'string') {
+        return null;
+    }
+
+    let filtros;
+    try {
+        filtros = JSON.parse(valor);
+    } catch {
+        return null;
+    }
+
+    if (!Array.isArray(filtros) || filtros.length > FILTROS_PERMITIDOS.size) {
+        return null;
+    }
+
+    const chavesUsadas = new Set();
+    for (const filtro of filtros) {
+        if (
+            !filtro ||
+            !FILTROS_PERMITIDOS.has(filtro.key) ||
+            chavesUsadas.has(filtro.key) ||
+            filtro.connection !== 'OR' ||
+            !Array.isArray(filtro.values) ||
+            filtro.values.length < 1 ||
+            filtro.values.length > 5 ||
+            filtro.values.some((item) =>
+                !item ||
+                typeof item.value !== 'string' ||
+                !/^[a-z0-9_]+$/.test(item.value)
+            )
+        ) {
+            return null;
+        }
+
+        chavesUsadas.add(filtro.key);
+    }
+
+    return filtros;
+}
+
 async function pesquisar(req, res) {
     try {
         const { search, page = '1', limit = '10' } = req.query;
@@ -35,10 +82,18 @@ async function pesquisar(req, res) {
             });
         }
 
+        const filtros = lerFiltros(req.query.filters);
+        if (!filtros) {
+            return res.status(400).json({
+                erro: 'Os filtros de gênero ou plataforma são inválidos.'
+            });
+        }
+
         const resultado = await gamebrainService.pesquisarJogos(
             search.trim(),
             pagina,
-            limite
+            limite,
+            filtros
         );
 
         return res.status(200).json(resultado);

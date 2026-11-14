@@ -106,16 +106,40 @@ function mapearJogo(jogo) {
     };
 }
 
-async function pesquisarJogos(termo, pagina = 1, limite = 10) {
+function mapearOpcoesDeFiltro(opcoes) {
+    if (!Array.isArray(opcoes)) {
+        return [];
+    }
+
+    return opcoes
+        .filter((filtro) => ['genre', 'platform'].includes(filtro?.key))
+        .map((filtro) => ({
+            chave: filtro.key,
+            nome: filtro.name,
+            opcoes: Array.isArray(filtro.values)
+                ? filtro.values
+                    .filter((opcao) =>
+                        typeof opcao?.key === 'string' &&
+                        typeof opcao?.name === 'string' &&
+                        /^[a-z0-9_]+$/.test(opcao.key)
+                    )
+                    .map((opcao) => ({
+                        chave: opcao.key,
+                        nome: opcao.name,
+                        total: Number.isSafeInteger(opcao.count) ? opcao.count : 0
+                    }))
+                : []
+        }));
+}
+
+async function pesquisarJogos(termo, pagina = 1, limite = 10, filtros = []) {
     const offset = (pagina - 1) * limite;
     const dados = await requisitarGameBrain('/games', {
         query: termo,
         offset: String(offset),
         limit: String(limite),
-        filters: '[]',
-        sort: 'computed_rating',
-        'sort-order': 'desc',
-        'generate-filter-options': 'false'
+        filters: JSON.stringify(filtros),
+        'generate-filter-options': 'true'
     });
 
     if (!dados || !Array.isArray(dados.results) || !Number.isSafeInteger(dados.total_results)) {
@@ -128,7 +152,8 @@ async function pesquisarJogos(termo, pagina = 1, limite = 10) {
         total: dados.total_results,
         pagina,
         limite,
-        resultados: dados.results.map(mapearJogo)
+        resultados: dados.results.map(mapearJogo),
+        filtros: mapearOpcoesDeFiltro(dados.filter_options)
     };
 }
 

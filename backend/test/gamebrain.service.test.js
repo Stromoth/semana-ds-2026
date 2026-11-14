@@ -10,7 +10,7 @@ afterEach(() => {
     global.fetch = originalFetch;
 });
 
-test('pesquisa jogos com autenticação GameBrain e normaliza os campos', async () => {
+test('preserva a relevância da busca e normaliza jogos e filtros GameBrain', async () => {
     let requestUrl;
     let requestOptions;
     global.fetch = async (url, options) => {
@@ -20,6 +20,18 @@ test('pesquisa jogos com autenticação GameBrain e normaliza os campos', async 
             ok: true,
             json: async () => ({
                 total_results: 21,
+                filter_options: [
+                    {
+                        name: 'Platform',
+                        key: 'platform',
+                        values: [{ name: 'PC', key: 'pc', count: 15 }]
+                    },
+                    {
+                        name: 'Release Date',
+                        key: 'release_date',
+                        values: [{ name: 'Last Year', key: 'last_year', count: 2 }]
+                    }
+                ],
                 results: [{
                     id: 64591,
                     name: 'Medieval II: Total War',
@@ -33,18 +45,31 @@ test('pesquisa jogos com autenticação GameBrain e normaliza os campos', async 
         };
     };
 
-    const result = await gamebrainService.pesquisarJogos('medieval strategy', 2, 4);
+    const result = await gamebrainService.pesquisarJogos('medieval strategy', 2, 4, [
+        { key: 'platform', values: [{ value: 'pc' }], connection: 'OR' }
+    ]);
 
     assert.equal(requestUrl.origin, 'https://api.gamebrain.co');
     assert.equal(requestUrl.pathname, '/v1/games');
     assert.equal(requestUrl.searchParams.get('query'), 'medieval strategy');
     assert.equal(requestUrl.searchParams.get('offset'), '4');
     assert.equal(requestUrl.searchParams.get('limit'), '4');
+    assert.deepEqual(JSON.parse(requestUrl.searchParams.get('filters')), [
+        { key: 'platform', values: [{ value: 'pc' }], connection: 'OR' }
+    ]);
+    assert.equal(requestUrl.searchParams.get('generate-filter-options'), 'true');
+    assert.equal(requestUrl.searchParams.has('sort'), false);
+    assert.equal(requestUrl.searchParams.has('sort-order'), false);
     assert.equal(requestOptions.headers['x-api-key'], 'test-key');
     assert.deepEqual(result, {
         total: 21,
         pagina: 2,
         limite: 4,
+        filtros: [{
+            chave: 'platform',
+            nome: 'Platform',
+            opcoes: [{ chave: 'pc', nome: 'PC', total: 15 }]
+        }],
         resultados: [{
             gamebrain_id: 64591,
             titulo: 'Medieval II: Total War',
