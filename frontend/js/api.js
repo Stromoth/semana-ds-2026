@@ -92,6 +92,27 @@
     }),
     setReviewLike: (id, liked) => request(`/api/reviews/${encodeURIComponent(id)}/like`, {
       method: liked ? "POST" : "DELETE"
+    }),
+    listPublicLists: () => request("/api/lists/public"),
+    listMyLists: () => request("/api/lists/mine"),
+    getList: (id) => request(`/api/lists/${encodeURIComponent(id)}`),
+    createList: (dados) => request("/api/lists", {
+      method: "POST",
+      body: JSON.stringify(dados)
+    }),
+    updateList: (id, dados) => request(`/api/lists/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(dados)
+    }),
+    deleteList: (id) => request(`/api/lists/${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    }),
+    addGameToList: (id, gamebrainId) => request(`/api/lists/${encodeURIComponent(id)}/games`, {
+      method: "POST",
+      body: JSON.stringify({ gamebrain_id: gamebrainId })
+    }),
+    removeGameFromList: (id, gamebrainId) => request(`/api/lists/${encodeURIComponent(id)}/games/${encodeURIComponent(gamebrainId)}`, {
+      method: "DELETE"
     })
   });
 })();

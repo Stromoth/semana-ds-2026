@@ -213,6 +213,31 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .library-empty{padding:34px 18px;border:1px dashed #3b596e;text-align:center}
 .library-empty p{margin:10px auto 0;max-width:480px;color:#a5b5bd;font-size:13px;line-height:1.55}
 .library-topbar-actions{display:flex;align-items:center;gap:18px}
+.list-section{margin-top:32px}
+.list-panel{margin-top:22px;padding:18px;border:1px solid #2a4053;background:#102030}
+.list-panel[hidden],.list-section[hidden]{display:none}
+.list-form{display:grid;gap:12px;margin-top:14px}
+.list-form label:not(.list-visibility){display:grid;gap:6px;color:#c6d3d9;font-size:12px;font-weight:600}
+.list-form input:not([type=checkbox]),.list-form textarea,.list-add-game select{width:100%;padding:10px;border:1px solid #2b455a;border-radius:3px;background:#0b1621;color:#eaf1f5}
+.list-form textarea{resize:vertical}
+.list-visibility{display:flex;align-items:center;gap:8px;color:#c6d3d9;font-size:12px}
+.list-visibility input{accent-color:var(--green)}
+.lists-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:14px}
+.list-card{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:9px;padding:15px;border:1px solid #2a4053;background:#102030}
+.list-card-title{margin:0;color:#f0f5f7;font-size:16px}
+.list-card-description{margin:0;color:#b6c4cb;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.list-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.list-detail-heading h2{margin:6px 0}
+.list-edit-form{grid-template-columns:repeat(2,minmax(0,1fr));align-items:end;padding:14px;background:#142333}
+.list-edit-form .list-visibility,.list-edit-form button{grid-column:span 2;justify-self:start}
+.list-owner-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:12px 0}
+.list-add-game{display:flex;flex-wrap:wrap;gap:8px}
+.list-add-game select{min-width:min(280px,70vw)}
+.list-games{display:grid;gap:10px;margin-top:16px}
+.list-game-card{display:grid;grid-template-columns:74px minmax(0,1fr);gap:14px;padding:12px;border:1px solid #2a4053;background:#0d1925}
+.list-game-card .library-cover{width:74px;height:96px}
+.list-game-content{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:8px}
+.list-game-content .library-game-title{font-size:14px}
 .game-detail-main{width:min(100%,900px);margin:0 auto;padding:48px 22px 64px}
 .game-detail-panel{display:grid;grid-template-columns:minmax(200px,320px) minmax(0,1fr);gap:28px;padding:22px;border:1px solid #2a4053;background:#102030}
 .game-detail-panel[hidden]{display:none}
@@ -265,7 +290,10 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
   .library-heading{align-items:start;flex-direction:column}
   .library-heading .section-title{font-size:23px}
   .library-card{grid-template-columns:74px minmax(0,1fr);gap:12px;padding:10px}
-  .library-cover{width:74px;height:104px}
+  .library-cover{width:74px;height:104px    .list-edit-form{grid-template-columns:1fr}
+    .list-edit-form .list-visibility,.list-edit-form button{grid-column:1}
+    .list-detail-heading{align-items:flex-start}
+  }
   .library-card-controls{align-items:stretch;flex-direction:column;gap:9px}
   .library-status-select{min-width:0}
   .library-topbar-actions{gap:10px}

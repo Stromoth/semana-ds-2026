@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Crie, organize e explore listas de jogos na Gamebox.">
+  <title>Listas de jogos · Gamebox</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="topline">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="site-width auth-topbar">
+        <a class="brand-link" href="/" aria-label="Voltar à Gamebox">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">GAMEBOX</span>
+        </a>
+        <div class="library-topbar-actions">
+          <a class="nav-link" href="/">DESCOBRIR</a>
+          <a class="nav-link" href="/pages/biblioteca.html">BIBLIOTECA</a>
+          <a class="nav-link" id="lists-login" href="/pages/login.html">ENTRAR</a>
+          <button class="nav-link" id="lists-logout" type="button" hidden>SAIR</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="library-main site-width">
+      <section aria-labelledby="lists-title">
+        <p class="section-kicker">COLEÇÕES DA COMUNIDADE</p>
+        <div class="library-heading">
+          <h1 class="section-title section-title--xl" id="lists-title">LISTAS DE JOGOS</h1>
+          <span id="lists-user" class="section-kicker"></span>
+        </div>
+        <p id="lists-status" class="form-status" role="status" aria-live="polite"></p>
+
+        <section id="create-list-section" class="list-panel" hidden>
+          <h2 class="section-title section-title--lg">CRIAR UMA LISTA</h2>
+          <form id="create-list-form" class="list-form">
+            <label>Nome
+              <input name="nome" minlength="2" maxlength="80" required placeholder="Ex.: RPGs para jogar">
+            </label>
+            <label>Descrição
+              <textarea name="descricao" maxlength="500" rows="2" placeholder="Sobre esta coleção (opcional)"></textarea>
+            </label>
+            <label class="list-visibility">
+              <input name="publica" type="checkbox" checked>
+              Tornar lista pública
+            </label>
+            <button class="orange-btn" type="submit">CRIAR LISTA</button>
+          </form>
+        </section>
+
+        <section id="my-lists-section" class="list-section" hidden>
+          <h2 class="section-title section-title--lg">SUAS LISTAS</h2>
+          <div id="my-lists" class="lists-grid"></div>
+        </section>
+
+        <section class="list-section">
+          <h2 class="section-title section-title--lg">LISTAS PÚBLICAS</h2>
+          <div id="public-lists" class="lists-grid"></div>
+        </section>
+
+        <section id="selected-list-section" class="list-panel" hidden aria-live="polite"></section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-width flex items-center justify-between gap-4">
+        <span class="brand-name">GAMEBOX</span>
+        <p class="footer-copy">© 2026 GameBox · Dados de jogos por <a href="https://gamebrain.co/api" target="_blank" rel="noopener noreferrer">GameBrain</a></p>
+      </div>
+    </footer>
+  </div>
+  <script src="../js/api.js"></script>
+  <script src="../js/listas.js"></script>
+</body>
+</html>
