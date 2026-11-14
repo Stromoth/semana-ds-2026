@@ -138,6 +138,7 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .review-heading{font-size:16px;font-weight:700;color:#f2f7f9}
 .review-meta{font-size:11px;color:#91a2ad}
 .review-copy{max-width:650px;color:#b6c4cb;font-size:13px;line-height:1.52}
+.review-meta.error{color:#ff9b83}
 .stars{color:var(--green);letter-spacing:1px;font-size:13px}
 .empty-star{color:#385568}
 .demo-review{animation:fadeUp .25s ease both}
@@ -146,6 +147,12 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .like-button:hover,.like-button.liked{color:var(--orange)}
 /* Formulário: JS alterna .selected nas estrelas do .rating-picker */
 .comment-box{background:#102030;border:1px solid #324f65;padding:14px}
+.comment-box[hidden],.review-auth-notice[hidden]{display:none}
+.review-auth-notice{margin:0 0 12px;padding:12px 14px;border:1px solid #324f65;color:#b6c4cb;font-size:12px}
+.review-auth-notice a{color:var(--green)}
+.review-card-actions{display:flex;gap:8px;margin-top:8px}
+.review-card-action{border:1px solid #3a566c;border-radius:3px;background:#1b3042;color:#eaf1f5;padding:5px 8px;font-size:10px;font-weight:700}
+.review-card-action:hover{border-color:var(--green)}
 .comment-box textarea{width:100%;resize:vertical;min-height:64px;background:#0b1621;border:1px solid #2b455a;color:#eaf1f5;padding:9px;font-size:12px}
 .rating-picker button{background:transparent;border:0;padding:2px;color:#3c5769;font-size:17px}
 .rating-picker button.selected{color:var(--green)}

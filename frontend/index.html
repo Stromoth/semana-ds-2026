@@ -175,36 +175,32 @@
           <div class="flex items-end justify-between gap-4 border-b border-[#304b61] pb-4">
             <div>
               <p class="section-kicker mb-1">O QUE A COMUNIDADE ESTÁ JOGANDO</p>
-              <h1 class="section-title section-title--xl">AVALIAÇÕES POPULARES ESTA SEMANA</h1>
+              <h1 class="section-title section-title--xl">AVALIAÇÕES RECENTES</h1>
             </div>
           
             <div class="flex items-center gap-4">
-              <span class="section-kicker">2.408.516 JOGOS AVALIADOS</span>
-              <button class="filter-button active" type="button">MAIS RECENTES</button>
+              <span class="section-kicker">FEED DA COMUNIDADE</span>
+              <span class="filter-button active">MAIS RECENTES</span>
             </div>
           </div>
 
           <div class="grid grid-cols-[minmax(0,1fr)_255px] gap-10 mt-5 reviews-layout">
             <section aria-label="Avaliações populares">
 
-              <!-- ↔ JS (initReviewForm): valida, cria a avaliação e a insere em #review-list -->
-              <form id="comment-form" class="comment-box" aria-label="Adicionar comentário demonstrativo">
-                <label class="section-kicker block mb-2" for="comment-input">COMPARTILHE UMA IMPRESSÃO</label>
+              <p id="review-auth-notice" class="review-auth-notice" role="status" hidden></p>
+
+              <form id="comment-form" class="comment-box" aria-label="Adicionar avaliação" hidden>
+                <label id="review-form-heading" class="section-kicker block mb-2" for="comment-input">AVALIE UM JOGO DA SUA BIBLIOTECA</label>
                
                 <div class="grid grid-cols-2 gap-2 mb-2">
-                  <label class="sr-only" for="comment-game">Escolha um jogo</label>
-                
-                  <!-- As opções de jogo são criadas pelo JS a partir da lista GAMES -->
-                  <select id="comment-game" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs"><option value="">Escolha um jogo</option></select>
-                
-                  <label class="sr-only" for="comment-platform">Escolha a plataforma</label>
-                
-                  <select id="comment-platform" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs">
-                    <option value="">Escolha a plataforma</option><option>PC</option><option>PlayStation</option><option>Xbox</option><option>Nintendo Switch</option><option>Mobile</option>
+                  <label class="sr-only" for="comment-game">Escolha um jogo da sua biblioteca</label>
+                  <select id="comment-game" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs" required>
+                    <option value="">Escolha um jogo da sua biblioteca</option>
                   </select>
                 </div>
                
-                <textarea id="comment-input" placeholder="Escreva uma impressão sobre um jogo..."></textarea>
+                <label class="sr-only" for="comment-input">Escreva sua avaliação</label>
+                <textarea id="comment-input" maxlength="2000" required placeholder="Escreva uma avaliação (até 2000 caracteres)..."></textarea>
                
                 <div class="flex justify-between items-center gap-3 mt-2">
                   <!-- ↔ JS: data-score guarda a nota (1 a 5); .selected é alternada pelo JS -->
@@ -213,16 +209,16 @@
                   </div>
                  
                   <!-- ↔ JS: fica disabled até o formulário estar completo; ↔ CSS: .orange-btn:disabled -->
-                  <button id="publish-button" class="orange-btn" type="submit">PUBLICAR</button>
+                  <div class="flex gap-2">
+                    <button id="cancel-review-edit" class="filter-action" type="button" hidden>Cancelar</button>
+                    <button id="publish-button" class="orange-btn" type="submit" disabled>PUBLICAR AVALIAÇÃO</button>
+                  </div>
                 </div>
                
                 <p id="comment-status" class="review-meta mt-2" aria-live="polite"></p>
               </form>
 
-              <!-- ↔ JS (renderReviews/buildReview): todas as avaliações são criadas aqui a partir da lista REVIEWS
-                   (js/main.js). Avaliações novas do formulário entram no topo.
-                   ↔ CSS: .review-scroll limita a altura e cria a barra de rolagem. -->
-              <div id="review-list" class="review-scroll" tabindex="0" role="region" aria-label="Lista de avaliações"></div>
+              <div id="review-list" class="review-scroll" tabindex="0" role="region" aria-label="Avaliações da comunidade"></div>
              
               <button type="button" class="orange-btn mt-7" data-screen-target="discover">VOLTAR À DESCOBERTA</button>
             </section>
@@ -298,8 +294,8 @@
   </div>
 
   <!-- ↔ JS: carregado por último, quando todo o HTML acima já existe -->
-  <script src="js/main.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
   <script src="js/navigation.js"></script>
 </body>
 </html>

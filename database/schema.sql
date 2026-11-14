@@ -29,3 +29,17 @@ CREATE TABLE biblioteca (
 
 CREATE INDEX biblioteca_usuario_adicionado_idx
 ON biblioteca (usuario_id, adicionado_em DESC);
+
+CREATE TABLE avaliacoes (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    jogo_id INTEGER NOT NULL REFERENCES jogos (id) ON DELETE CASCADE,
+    nota SMALLINT NOT NULL CHECK (nota BETWEEN 1 AND 5),
+    texto VARCHAR(2000) NOT NULL CHECK (LENGTH(BTRIM(texto)) BETWEEN 1 AND 2000),
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (usuario_id, jogo_id)
+);
+
+CREATE INDEX avaliacoes_criada_em_idx
+ON avaliacoes (criada_em DESC);

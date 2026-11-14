@@ -10,6 +10,7 @@ const authRoutes = require('./src/routes/auth.routes');
 const libraryRoutes = require("./src/routes/library.routes");
 
 const gamesRoutes = require('./src/routes/games.routes');
+const reviewsRoutes = require('./src/routes/reviews.routes');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
     throw new Error('Configure SESSION_SECRET com pelo menos 32 caracteres.');
@@ -46,6 +47,7 @@ app.use(session({
 app.use('/api/auth', authRoutes);
 app.use('/api/games', gamesRoutes);
 app.use("/api/library", libraryRoutes);
+app.use('/api/reviews', reviewsRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

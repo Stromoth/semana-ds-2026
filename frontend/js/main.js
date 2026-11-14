@@ -26,22 +26,6 @@ const GAMES = [
   { id: 8, title: "Iron Circuit", year: 2026, genres: ["Ação"], platforms: ["PC"], platformLabel: "Arcade", rating: null, votes: 800, reviews: 0, features: ["Multiplayer", "Acesso antecipado"], image: pexels(28833650), alt: "Figura com capacete em cenário escuro" }
 ];
 
-/* Avaliações de exemplo (gameId = id em GAMES), da mais recente para a mais antiga.
-   Futuramente virão do banco de dados. */
-const REVIEWS = [
-  { gameId: 1, author: "daniel.aurora", platform: "PC", rating: 4, likes: 128, text: "A exploração recompensa cada desvio do caminho principal. As zonas neon parecem esconder uma nova história em cada esquina." },
-  { gameId: 2, author: "clara.pixel", platform: "PC", rating: 5, likes: 96, text: "Um sistema de combate preciso, com uma trilha sonora memorável. Cada confronto encontra uma forma nova de elevar a tensão." },
-  { gameId: 3, author: "tomaz.ctrl", platform: "PlayStation", rating: 3, likes: 71, text: "A sensação de pilotar entre ruínas orbitais é incrível. O ritmo inicial é lento, mas a descoberta compensa cada minuto." },
-  { gameId: 4, author: "lucas.drift", platform: "Xbox", rating: 4, likes: 54, text: "A física dos carros é um prazer de dominar. As pistas molhadas exigem precisão, e cada derrapagem bem executada dá uma satisfação enorme." },
-  { gameId: 6, author: "mari.ondas", platform: "Nintendo Switch", rating: 5, likes: 112, text: "Uma aventura pequena e linda. O mar muda a cada capítulo e a trilha acompanha cada maré. Fácil de recomendar para qualquer pessoa." },
-  { gameId: 5, author: "helena.tactics", platform: "PC", rating: 4, likes: 38, text: "Estratégia densa, mas que ensina com paciência. Planejar a invasão do cofre antes de agir é viciante, só faltou um pouco mais de variedade de mapas." },
-  { gameId: 1, author: "bia.combo", platform: "PlayStation", rating: 5, likes: 84, text: "Os combos encaixam de um jeito muito fluido, e as cidades neon deixam cada luta ainda mais bonita. Já passei das 40 horas." },
-  { gameId: 7, author: "joao.sombra", platform: "PC", rating: 4, likes: 29, text: "Curto e contemplativo. Dá para terminar em uma tarde, mas as paisagens e os sons da floresta ficam na cabeça por dias." },
-  { gameId: 3, author: "rafael.quest", platform: "Xbox", rating: 5, likes: 66, text: "O melhor RPG espacial que joguei em anos. As escolhas realmente mudam a tripulação, e o final me pegou de surpresa." },
-  { gameId: 2, author: "vinilbyte", platform: "PC", rating: 4, likes: 41, text: "Sobreviver com poucos recursos gera uma tensão constante. Jogar em cooperativo deixa tudo mais divertido, e mais caótico também." },
-  { gameId: 8, author: "pedro.volt", platform: "PC", rating: 3, likes: 9, text: "Promissor, mas ainda é acesso antecipado: faltam modos e o equilíbrio das partidas oscila. A base é ótima e vale acompanhar as atualizações." }
-];
-
 /* Os valores dos filtros são fornecidos pela GameBrain para cada busca. */
 const FILTERS = {
   genre: { label: "GÊNERO", options: [] },
@@ -393,77 +377,234 @@ async function fetchGameBrainResults(query, page, showLastPage = false) {
   }
 }
 
-/* ---------- 5. CURTIDAS ----------
-   ↔ HTML: botões .like-button (com <span> contendo o número). Delegação: vale
-   também para avaliações criadas depois pelo formulário. */
-document.addEventListener("click", event => {
-  const button = event.target.closest(".like-button");
-  if (!button) return;
-  const count = button.querySelector("span");
-  const liked = button.classList.toggle("liked"); // ↔ CSS .like-button.liked
-  button.setAttribute("aria-pressed", String(liked));
-  count.textContent = String(Math.max(0, Number(count.textContent) + (liked ? 1 : -1)));
-});
-
-/* ---------- 6. FORMULÁRIO DE AVALIAÇÃO ----------
-   ↔ HTML: #comment-form, #comment-game, #comment-platform, #comment-input,
+/* ---------- 5. AVALIAÇÕES PERSISTENTES ----------
+   ↔ HTML: #comment-form, #comment-game, #comment-input,
    #publish-button, #comment-status, #review-list e .rating-picker button */
-function buildReview(game, platform, rating, text, author = "jogador demonstrativo", likes = 0) {
-  const review = el("article", "review-card demo-review"); // ↔ CSS .review-card
-  review.innerHTML = `<div class="review-art"></div><div><div class="flex flex-wrap justify-between gap-3"><div><h2 class="review-heading"></h2><p class="review-meta mt-1"></p></div><span class="stars" aria-label="${rating} de 5 estrelas">${"★".repeat(rating)}<span class="empty-star">${"★".repeat(5 - rating)}</span></span></div><p class="review-copy mt-3"></p><button class="like-button mt-3" type="button" aria-pressed="false"><i data-lucide="heart" class="inline-block align-text-bottom" width="13" height="13"></i> <span>${likes}</span> curtidas</button></div>`;
+const ownReviewIds = new Set();
+function formatReviewDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR");
+}
+
+function buildReview(review) {
+  const card = el("article", "review-card");
   const poster = el("img", "review-poster");
-  poster.src = game.image; poster.alt = game.alt;
-  review.querySelector(".review-art").replaceWith(poster);
-  // Textos digitados pelo usuário entram via textContent (seguro contra HTML injetado)
-  review.querySelector(".review-heading").textContent = `${game.title} · ${game.year}`;
-  review.querySelector(".review-meta").textContent = `por ${author} · ${platform}`;
-  review.querySelector(".review-copy").textContent = text;
-  return review;
+  poster.alt = `Capa de ${review.titulo}`;
+  poster.loading = "lazy";
+  if (review.capa_url) poster.src = review.capa_url;
+  else poster.hidden = true;
+
+  const content = el("div");
+  const heading = el("div", "flex flex-wrap justify-between gap-3");
+  const headingText = el("div");
+  const title = el("h2", "review-heading", review.titulo);
+  const date = formatReviewDate(review.atualizada_em || review.criada_em);
+  const meta = el("p", "review-meta mt-1", `por ${review.autor || "Você"}${date ? ` · ${date}` : ""}`);
+  const stars = el("span", "stars", `${"★".repeat(review.nota)}${"☆".repeat(5 - review.nota)}`);
+  stars.setAttribute("aria-label", `${review.nota} de 5 estrelas`);
+  headingText.append(title, meta);
+  heading.append(headingText, stars);
+  const text = el("p", "review-copy mt-3", review.texto);
+  content.append(heading, text);
+
+  if (ownReviewIds.has(review.id)) {
+    const actions = el("div", "review-card-actions");
+    actions.append(
+      makeButton("EDITAR", "review-card-action", () => beginReviewEdit(review)),
+      makeButton("EXCLUIR", "review-card-action", () => deleteReview(review))
+    );
+    content.append(actions);
+  }
+
+  card.append(poster, content);
+  return card;
 }
 
-// Preenche #review-list (↔ HTML) com as avaliações da lista REVIEWS
-function renderReviews() {
-  $("review-list").append(...REVIEWS.map(r => buildReview(GAMES.find(g => g.id === r.gameId), r.platform, r.rating, r.text, r.author, r.likes)));
+let editingReviewId = null;
+let reviewGames = [];
+
+function setReviewStatus(message, isError = false) {
+  const status = $("comment-status");
+  status.textContent = message;
+  status.classList.toggle("error", isError);
 }
 
-function initReviewForm() {
-  const gameSelect = $("comment-game"), platformSelect = $("comment-platform"), input = $("comment-input");
-  const status = $("comment-status"), publishButton = $("publish-button");
+function resetReviewForm() {
+  editingReviewId = null;
+  $("comment-form").reset();
+  $("comment-game").disabled = false;
+  $("review-form-heading").textContent = "AVALIE UM JOGO DA SUA BIBLIOTECA";
+  $("publish-button").textContent = "PUBLICAR AVALIAÇÃO";
+  $("cancel-review-edit").hidden = true;
+  document.querySelectorAll(".rating-picker button").forEach(button => {
+    button.classList.remove("selected");
+    button.setAttribute("aria-pressed", "false");
+  });
+  updateReviewSubmitState();
+}
+
+function beginReviewEdit(review) {
+  editingReviewId = review.id;
+  $("comment-game").value = String(review.gamebrain_id);
+  $("comment-game").disabled = true;
+  $("comment-input").value = review.texto;
+  document.querySelectorAll(".rating-picker button").forEach(button => {
+    const selected = Number(button.dataset.score) <= review.nota;
+    button.classList.toggle("selected", selected);
+    button.setAttribute("aria-pressed", String(Number(button.dataset.score) === review.nota));
+  });
+  $("review-form-heading").textContent = `EDITANDO AVALIAÇÃO: ${review.titulo}`;
+  $("publish-button").textContent = "SALVAR ALTERAÇÕES";
+  $("cancel-review-edit").hidden = false;
+  setReviewStatus("");
+  $("comment-form").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+async function loadReviews() {
+  const list = $("review-list");
+  list.replaceChildren(el("p", "review-meta", "Carregando avaliações…"));
+  try {
+    const reviews = await window.GameboxApi.listReviews();
+    list.replaceChildren(...reviews.map(buildReview));
+    if (reviews.length === 0) {
+      list.append(el("p", "review-meta", "Ainda não há avaliações. Seja a primeira pessoa a avaliar um jogo."));
+    }
+  } catch (error) {
+    list.replaceChildren(el("p", "form-status error", error.message));
+  }
+}
+
+async function deleteReview(review) {
+  if (!window.confirm(`Excluir sua avaliação de “${review.titulo}”?`)) return;
+  try {
+    await window.GameboxApi.deleteReview(review.id);
+    ownReviewIds.delete(review.id);
+    const option = $("comment-game").querySelector(`option[value="${review.gamebrain_id}"]`);
+    if (option) {
+      option.disabled = false;
+      option.textContent = reviewGames.find(game => game.gamebrain_id === review.gamebrain_id)?.titulo || review.titulo;
+    }
+    if (editingReviewId === review.id) resetReviewForm();
+    setReviewStatus("Avaliação excluída.");
+    await loadReviews();
+  } catch (error) {
+    setReviewStatus(error.message, true);
+  }
+}
+
+function updateReviewSubmitState() {
+  const hasScore = document.querySelector(".rating-picker button.selected");
+  const canSubmit = Boolean(
+    $("comment-input").value.trim() &&
+    hasScore &&
+    (editingReviewId || ($("comment-game").value && !$("comment-game").disabled))
+  );
+  $("publish-button").disabled = !canSubmit;
+}
+
+async function initReviewForm() {
+  const gameSelect = $("comment-game");
+  const input = $("comment-input");
+  const publishButton = $("publish-button");
   const starButtons = [...document.querySelectorAll(".rating-picker button")];
-  let score = 0;
+  const form = $("comment-form");
+  const authNotice = $("review-auth-notice");
 
-  GAMES.forEach(game => gameSelect.append(new Option(game.title, game.title))); // mesma lista dos cards
+  try {
+    const { usuario } = await window.GameboxApi.currentUser();
+    authNotice.hidden = true;
+    form.hidden = false;
+    const [library, mine] = await Promise.all([
+      window.GameboxApi.listLibrary(),
+      window.GameboxApi.listMyReviews()
+    ]);
+    reviewGames = library.filter(game => Number.isSafeInteger(game.gamebrain_id));
+    for (const game of reviewGames) {
+      const option = new Option(game.titulo, String(game.gamebrain_id));
+      option.disabled = mine.some(review => review.gamebrain_id === game.gamebrain_id);
+      if (option.disabled) option.textContent += " — já avaliado";
+      gameSelect.append(option);
+    }
+    mine.forEach(review => ownReviewIds.add(review.id));
+    if (reviewGames.length === 0) {
+      gameSelect.disabled = true;
+      setReviewStatus("Adicione um jogo à sua biblioteca antes de avaliá-lo.");
+    } else {
+      gameSelect.disabled = false;
+      setReviewStatus(`Conectado como ${usuario.nome}.`);
+    }
+  } catch (error) {
+    if (error.status === 401) {
+      authNotice.replaceChildren(
+        document.createTextNode("Entre na sua conta e adicione jogos à biblioteca para publicar uma avaliação. "),
+        Object.assign(el("a", "", "Entrar"), { href: "/pages/login.html" })
+      );
+      authNotice.hidden = false;
+      form.hidden = true;
+    } else {
+      form.hidden = false;
+      gameSelect.disabled = true;
+      setReviewStatus(error.message, true);
+    }
+  }
 
-  const updatePublishState = () => { publishButton.disabled = !(gameSelect.value && platformSelect.value && score && input.value.trim()); };
-  const resetStars = () => starButtons.forEach(b => { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
-  [gameSelect, platformSelect, input].forEach(control => control.addEventListener("input", updatePublishState));
+  [gameSelect, input].forEach(control => {
+    control.addEventListener("input", updateReviewSubmitState);
+    control.addEventListener("change", updateReviewSubmitState);
+  });
   starButtons.forEach(star => star.addEventListener("click", () => {
-    score = Number(star.dataset.score);
-    starButtons.forEach(b => { b.classList.toggle("selected", Number(b.dataset.score) <= score); b.setAttribute("aria-pressed", String(Number(b.dataset.score) === score)); }); // ↔ CSS .rating-picker button.selected
-    updatePublishState();
+    const score = Number(star.dataset.score);
+    starButtons.forEach(button => {
+      button.classList.toggle("selected", Number(button.dataset.score) <= score);
+      button.setAttribute("aria-pressed", String(Number(button.dataset.score) === score));
+    });
+    updateReviewSubmitState();
   }));
 
-  $("comment-form").addEventListener("submit", event => {
-    event.preventDefault();
-    const game = GAMES.find(g => g.title === gameSelect.value);
-    const text = input.value.trim();
-    if (!game || !platformSelect.value || !score || !text) { status.textContent = "Escolha jogo, plataforma, nota e escreva um comentário."; return; }
-    $("review-list").prepend(buildReview(game, platformSelect.value, score, text));
-    $("review-list").scrollTop = 0; // mostra a avaliação nova no topo da lista rolável
-    lucide.createIcons(); // desenha o ícone de coração da nova avaliação
-    input.value = gameSelect.value = platformSelect.value = "";
-    score = 0; resetStars();
-    updatePublishState(); // corrige: o botão volta a ficar desabilitado após publicar
-    status.textContent = "Comentário publicado nesta demonstração.";
+  $("cancel-review-edit").addEventListener("click", () => {
+    resetReviewForm();
+    setReviewStatus("");
   });
-  updatePublishState();
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const nota = Number(document.querySelector(".rating-picker button[aria-pressed='true']")?.dataset.score);
+    const text = input.value.trim();
+    const gamebrainId = Number(gameSelect.value);
+    publishButton.disabled = true;
+    setReviewStatus(editingReviewId ? "Salvando alterações…" : "Publicando avaliação…");
+    try {
+      if (editingReviewId) {
+        await window.GameboxApi.updateReview(editingReviewId, nota, text);
+      } else {
+        await window.GameboxApi.createReview(gamebrainId, nota, text);
+      }
+      const wasEditing = Boolean(editingReviewId);
+      resetReviewForm();
+      const reviewedIds = await window.GameboxApi.listMyReviews();
+      ownReviewIds.clear();
+      reviewedIds.forEach(review => ownReviewIds.add(review.id));
+      gameSelect.querySelectorAll("option").forEach(option => {
+        if (option.value) {
+          option.disabled = reviewedIds.some(review => String(review.gamebrain_id) === option.value);
+          option.textContent = reviewGames.find(game => String(game.gamebrain_id) === option.value)?.titulo +
+            (option.disabled ? " — já avaliado" : "");
+        }
+      });
+      setReviewStatus(wasEditing ? "Avaliação atualizada." : "Avaliação publicada.");
+      await loadReviews();
+    } catch (error) {
+      setReviewStatus(error.message, true);
+      updateReviewSubmitState();
+    }
+  });
+  updateReviewSubmitState();
 }
 
 /* ---------- 7. INICIALIZAÇÃO ---------- */
-renderReviews(); // cria as avaliações antes dos ícones, para os corações aparecerem
 lucide.createIcons(); // transforma os <i data-lucide="..."> do HTML em ícones
 buildPanels();
-initReviewForm();
+initReviewForm().then(loadReviews);
 
 // Busca os jogos reais com debounce para reduzir chamadas e consumo da cota da API.
 $("game-search").addEventListener("input", event => {

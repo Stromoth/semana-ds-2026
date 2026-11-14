@@ -75,6 +75,19 @@
     }),
     removeFromLibrary: (id) => request(`/api/library/${encodeURIComponent(id)}`, {
       method: "DELETE"
+    }),
+    listReviews: () => request("/api/reviews"),
+    listMyReviews: () => request("/api/reviews/mine"),
+    createReview: (gamebrainId, nota, texto) => request("/api/reviews", {
+      method: "POST",
+      body: JSON.stringify({ gamebrain_id: gamebrainId, nota, texto })
+    }),
+    updateReview: (id, nota, texto) => request(`/api/reviews/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ nota, texto })
+    }),
+    deleteReview: (id) => request(`/api/reviews/${encodeURIComponent(id)}`, {
+      method: "DELETE"
     })
   });
 })();
