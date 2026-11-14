@@ -76,7 +76,8 @@
     removeFromLibrary: (id) => request(`/api/library/${encodeURIComponent(id)}`, {
       method: "DELETE"
     }),
-    listReviews: () => request("/api/reviews"),
+    listReviews: (sort = "recent") => request(`/api/reviews?sort=${encodeURIComponent(sort)}`),
+    listActivities: () => request("/api/activities"),
     listMyReviews: () => request("/api/reviews/mine"),
     createReview: (gamebrainId, nota, texto) => request("/api/reviews", {
       method: "POST",
@@ -88,6 +89,9 @@
     }),
     deleteReview: (id) => request(`/api/reviews/${encodeURIComponent(id)}`, {
       method: "DELETE"
+    }),
+    setReviewLike: (id, liked) => request(`/api/reviews/${encodeURIComponent(id)}/like`, {
+      method: liked ? "POST" : "DELETE"
     })
   });
 })();

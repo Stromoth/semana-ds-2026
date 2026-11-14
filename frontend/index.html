@@ -146,23 +146,16 @@
                 
                 <span class="section-kicker">VER ATIVIDADE</span>
               </div>
-              <div class="flex gap-2 overflow-hidden">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/28833650/pexels-photo-28833650.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Figura com capacete em cenário escuro">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/36941390/pexels-photo-36941390.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Nave espacial orbitando planeta colorido">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/18794533/pexels-photo-18794533.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Carro amarelo visto por trás em festival noturno">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/18337612/pexels-photo-18337612.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Paisagem digital abstrata com luzes neon">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/9314016/pexels-photo-9314016.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Ondas intensas sob céu de tempestade">
-                <img class="mini-poster" loading="lazy" src="https://images.pexels.com/photos/18419510/pexels-photo-18419510.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=400" alt="Paisagem digital futurista com blocos iluminados">
+              <div id="recent-activity-games" class="recent-activity-games" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
               </div>
             </div>
            
             <aside>
-              <h2 class="section-title section-title--lg mb-3">NA SUA REDE</h2>
+              <h2 class="section-title section-title--lg mb-3">ATIVIDADE RECENTE</h2>
               
-              <div class="space-y-2 text-[11px] text-slate-400">
-                <p><span class="text-slate-200 font-semibold">marina.arcade</span> avaliou <span class="green">★★★★★</span></p>
-                <p><span class="text-slate-200 font-semibold">kai_mora</span> criou uma lista de RPGs</p>
-                <p><span class="text-slate-200 font-semibold">nova_lu</span> terminou uma campanha</p>
+              <div id="network-activity-list" class="network-activity-list" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
               </div>
             </aside>
           </div>
@@ -179,8 +172,11 @@
             </div>
           
             <div class="flex items-center gap-4">
-              <span class="section-kicker">FEED DA COMUNIDADE</span>
-              <span class="filter-button active">MAIS RECENTES</span>
+              <label class="section-kicker" for="review-sort">ORDENAR</label>
+              <select id="review-sort" class="review-sort" aria-label="Ordenar avaliações">
+                <option value="recent">MAIS RECENTES</option>
+                <option value="popular">MAIS POPULARES</option>
+              </select>
             </div>
           </div>
 
@@ -225,6 +221,13 @@
 
             <aside class="side-column">
               <section class="aside-panel">
+                <h2 class="section-title section-title--lg mb-3">ATIVIDADE RECENTE</h2>
+                <div id="feed-activity-list" class="network-activity-list" aria-live="polite">
+                  <p class="review-meta">Carregando atividade…</p>
+                </div>
+              </section>
+
+              <section class="aside-panel" hidden>
                 <div class="flex justify-between items-center mb-3">
                   <h2 class="section-title section-title--lg">ESCOLHAS DA EQUIPE</h2>
                   <span class="section-kicker">MAIS</span>
@@ -240,7 +243,7 @@
                 </div>
               </section>
             
-              <section class="aside-panel mt-7">
+              <section class="aside-panel mt-7" hidden>
                 <h2 class="section-title section-title--lg mb-3">JOGADORES ATIVOS</h2>
              
                 <div class="space-y-3">

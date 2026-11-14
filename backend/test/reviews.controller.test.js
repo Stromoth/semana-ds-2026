@@ -77,6 +77,63 @@ test('informa quando o jogo ainda não pertence à biblioteca', async () => {
     assert.match(res.body.erro, /biblioteca/);
 });
 
+test('lista avaliações com ordenação permitida e usuário atual', async () => {
+    let args;
+    reviewsService.listarAvaliacoes = async (...values) => {
+        args = values;
+        return [];
+    };
+
+    const recent = response();
+    await reviewsController.listar({
+        query: { sort: 'recent' },
+        session: { userId: 5 }
+    }, recent);
+    assert.equal(recent.statusCode, 200);
+    assert.deepEqual(args, ['recent', 5]);
+
+    const popular = response();
+    await reviewsController.listar({ query: { sort: 'popular' }, session: {} }, popular);
+    assert.equal(popular.statusCode, 200);
+    assert.deepEqual(args, ['popular', null]);
+
+    const invalid = response();
+    await reviewsController.listar({ query: { sort: 'unknown' } }, invalid);
+    assert.equal(invalid.statusCode, 400);
+});
+
+test('define curtida ou remoção e trata avaliação inexistente', async () => {
+    let args;
+    reviewsService.definirCurtida = async (...values) => {
+        args = values;
+        return { curtida: values[2], curtidas: 4 };
+    };
+
+    const liked = response();
+    await reviewsController.curtir({
+        usuario: { id: 8 },
+        params: { id: '12' }
+    }, liked);
+    assert.equal(liked.statusCode, 200);
+    assert.deepEqual(args, [8, 12, true]);
+
+    const unliked = response();
+    await reviewsController.descurtir({
+        usuario: { id: 8 },
+        params: { id: '12' }
+    }, unliked);
+    assert.equal(unliked.statusCode, 200);
+    assert.deepEqual(args, [8, 12, false]);
+
+    reviewsService.definirCurtida = async () => null;
+    const missing = response();
+    await reviewsController.curtir({
+        usuario: { id: 8 },
+        params: { id: '12' }
+    }, missing);
+    assert.equal(missing.statusCode, 404);
+});
+
 test('atualiza e remove somente pela operação delegada ao usuário autenticado', async () => {
     let updateArgs;
     let deleteArgs;

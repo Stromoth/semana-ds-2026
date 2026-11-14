@@ -43,3 +43,23 @@ CREATE TABLE avaliacoes (
 
 CREATE INDEX avaliacoes_criada_em_idx
 ON avaliacoes (criada_em DESC);
+
+CREATE TABLE curtidas_avaliacoes (
+    avaliacao_id INTEGER NOT NULL REFERENCES avaliacoes (id) ON DELETE CASCADE,
+    usuario_id INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (avaliacao_id, usuario_id)
+);
+
+CREATE TABLE atividades (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id INTEGER NOT NULL REFERENCES usuarios (id) ON DELETE CASCADE,
+    jogo_id INTEGER NOT NULL REFERENCES jogos (id) ON DELETE CASCADE,
+    tipo VARCHAR(30) NOT NULL
+        CHECK (tipo IN ('jogo_adicionado', 'jogo_removido', 'status_alterado', 'avaliacao_publicada', 'avaliacao_editada', 'avaliacao_excluida', 'avaliacao_curtida')),
+    detalhes JSONB NOT NULL DEFAULT '{}'::jsonb,
+    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX atividades_criada_em_idx
+ON atividades (criada_em DESC, id DESC);

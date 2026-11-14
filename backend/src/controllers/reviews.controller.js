@@ -26,12 +26,51 @@ function lerAvaliacao(body) {
 
 async function listar(req, res) {
     try {
-        const avaliacoes = await reviewsService.listarAvaliacoes();
+        const ordenacao = req.query.sort === undefined ? 'recent' : req.query.sort;
+        if (!['recent', 'popular'].includes(ordenacao)) {
+            return res.status(400).json({
+                erro: 'Ordenação inválida. Use recent ou popular.'
+            });
+        }
+        const usuarioId = Number.isSafeInteger(req.session?.userId)
+            ? req.session.userId
+            : null;
+        const avaliacoes = await reviewsService.listarAvaliacoes(ordenacao, usuarioId);
         return res.status(200).json(avaliacoes);
     } catch (error) {
         console.error('Erro ao consultar avaliações:', error);
         return res.status(500).json({ erro: 'Erro ao consultar avaliações.' });
     }
+}
+
+async function definirCurtida(req, res, curtida) {
+    const avaliacaoId = lerId(req.params.id);
+    if (!avaliacaoId) {
+        return res.status(400).json({ erro: 'ID de avaliação inválido.' });
+    }
+
+    try {
+        const resultado = await reviewsService.definirCurtida(
+            req.usuario.id,
+            avaliacaoId,
+            curtida
+        );
+        if (!resultado) {
+            return res.status(404).json({ erro: 'Avaliação não encontrada.' });
+        }
+        return res.status(200).json(resultado);
+    } catch (error) {
+        console.error('Erro ao atualizar curtida:', error);
+        return res.status(500).json({ erro: 'Erro ao atualizar curtida.' });
+    }
+}
+
+function curtir(req, res) {
+    return definirCurtida(req, res, true);
+}
+
+function descurtir(req, res) {
+    return definirCurtida(req, res, false);
 }
 
 async function listarMinhas(req, res) {
@@ -140,5 +179,7 @@ module.exports = {
     listarMinhas,
     criar,
     atualizar,
-    remover
+    remover,
+    curtir,
+    descurtir
 };

@@ -123,6 +123,15 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 .recent-strip{border-top:1px solid #273f55;background:#0d1925}
 .mini-poster{width:48px;height:68px;object-fit:cover;border:1px solid #3b596e;transition:.18s}
 .mini-poster:hover{transform:translateY(-3px);border-color:var(--electric)}
+.recent-activity-games{display:flex;gap:8px;overflow-x:auto;min-height:84px}
+.recent-activity-game{position:relative;flex:0 0 64px;height:84px;overflow:hidden;border:1px solid #3b586b;background:#102030}
+.recent-activity-game img{width:100%;height:100%;object-fit:cover}
+.recent-activity-game span{position:absolute;inset:auto 0 0;padding:12px 3px 4px;background:linear-gradient(transparent,rgba(0,0,0,.9));color:#fff;font-size:8px;line-height:1.2}
+.network-activity-list{display:grid;gap:9px;color:#90a0ad;font-size:11px}
+.network-activity-item strong{color:#e5eef2}
+.network-activity-item a{color:inherit;text-decoration:none}
+.network-activity-item a:hover{color:var(--green)}
+.review-sort{border:1px solid #334d63;border-radius:3px;background:#0a131c;color:#eaf1f5;padding:7px 9px;font-size:10px;font-weight:700;letter-spacing:.04em}
 .aside-panel{border-top:1px solid #39546a;padding-top:12px}
 .pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
 .pick-grid img{width:100%;aspect-ratio:.72;object-fit:cover;border:1px solid #3b586b;transition:.18s}
@@ -145,6 +154,7 @@ main{flex:1 0 auto} /* ocupa o espaço que sobra e empurra o rodapé para o fim 
 /* JS (delegação de cliques) alterna .liked e aria-pressed */
 .like-button{border:0;background:transparent;padding:2px;color:#99a9b2;font-size:11px;transition:.18s}
 .like-button:hover,.like-button.liked{color:var(--orange)}
+.like-button:disabled{opacity:.55;cursor:wait}
 /* Formulário: JS alterna .selected nas estrelas do .rating-picker */
 .comment-box{background:#102030;border:1px solid #324f65;padding:14px}
 .comment-box[hidden],.review-auth-notice[hidden]{display:none}

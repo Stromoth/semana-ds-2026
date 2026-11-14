@@ -407,6 +407,15 @@ function buildReview(review) {
   const text = el("p", "review-copy mt-3", review.texto);
   content.append(heading, text);
 
+  const likeButton = makeButton(
+    `${review.curtida_pelo_usuario ? "♥" : "♡"} ${review.curtidas || 0} curtidas`,
+    `like-button mt-3${review.curtida_pelo_usuario ? " liked" : ""}`,
+    () => toggleReviewLike(review, likeButton)
+  );
+  likeButton.setAttribute("aria-pressed", String(Boolean(review.curtida_pelo_usuario)));
+  likeButton.setAttribute("aria-label", review.curtida_pelo_usuario ? "Remover curtida" : "Curtir avaliação");
+  content.append(likeButton);
+
   if (ownReviewIds.has(review.id)) {
     const actions = el("div", "review-card-actions");
     actions.append(
@@ -420,8 +429,110 @@ function buildReview(review) {
   return card;
 }
 
+async function toggleReviewLike(review, button) {
+  const currentlyLiked = button.getAttribute("aria-pressed") === "true";
+  button.disabled = true;
+  try {
+    await window.GameboxApi.setReviewLike(review.id, !currentlyLiked);
+    await loadReviews();
+    await loadActivities();
+  } catch (error) {
+    if (error.status === 401) {
+      const notice = $("review-auth-notice");
+      notice.replaceChildren(
+        document.createTextNode("Entre na sua conta para curtir avaliações. "),
+        Object.assign(el("a", "", "Entrar"), { href: "/pages/login.html" })
+      );
+      notice.hidden = false;
+    } else {
+      setReviewStatus(error.message, true);
+    }
+    button.disabled = false;
+  }
+}
+
 let editingReviewId = null;
 let reviewGames = [];
+const statusNames = {
+  quero_jogar: "Quero jogar",
+  jogando: "Jogando",
+  pausado: "Pausado",
+  concluido: "Concluído",
+  abandonado: "Abandonado"
+};
+
+function describeActivity(activity) {
+  switch (activity.tipo) {
+    case "jogo_adicionado":
+      return "adicionou à biblioteca";
+    case "jogo_removido":
+      return "removeu da biblioteca";
+    case "status_alterado":
+      return `alterou o status para ${statusNames[activity.detalhes?.atual] || "atualizado"}`;
+    case "avaliacao_publicada":
+      return "publicou uma avaliação";
+    case "avaliacao_editada":
+      return "editou uma avaliação";
+    case "avaliacao_excluida":
+      return "removeu uma avaliação";
+    case "avaliacao_curtida":
+      return "curtiu uma avaliação";
+    default:
+      return "interagiu com";
+  }
+}
+
+async function loadActivities() {
+  const sidebar = $("network-activity-list");
+  const games = $("recent-activity-games");
+  const feedSidebar = $("feed-activity-list");
+  try {
+    const activities = await window.GameboxApi.listActivities();
+    sidebar.replaceChildren();
+    games.replaceChildren();
+    feedSidebar.replaceChildren();
+
+    if (activities.length === 0) {
+      sidebar.append(el("p", "review-meta", "Ainda não há atividade da comunidade."));
+      games.append(el("p", "review-meta", "Os jogos recentes da comunidade aparecerão aqui."));
+      feedSidebar.append(el("p", "review-meta", "Ainda não há atividade da comunidade."));
+      return;
+    }
+
+    activities.slice(0, 5).forEach(activity => {
+      const item = el("p", "network-activity-item");
+      const link = el("a", "", activity.titulo);
+      link.href = `/pages/jogo.html?id=${encodeURIComponent(activity.gamebrain_id)}`;
+      const author = el("strong", "", activity.autor);
+      item.append(author, ` ${describeActivity(activity)} `, link);
+      sidebar.append(item);
+      feedSidebar.append(item.cloneNode(true));
+    });
+
+    const usedGames = new Set();
+    for (const activity of activities) {
+      if (usedGames.has(activity.gamebrain_id)) continue;
+      usedGames.add(activity.gamebrain_id);
+      const link = el("a", "recent-activity-game");
+      link.href = `/pages/jogo.html?id=${encodeURIComponent(activity.gamebrain_id)}`;
+      link.setAttribute("aria-label", `${activity.titulo}: ${activity.autor} ${describeActivity(activity)}`);
+      if (activity.capa_url) {
+        const image = el("img");
+        image.src = activity.capa_url;
+        image.alt = "";
+        image.loading = "lazy";
+        link.append(image);
+      }
+      link.append(el("span", "", activity.titulo));
+      games.append(link);
+      if (usedGames.size === 6) break;
+    }
+  } catch (error) {
+    sidebar.replaceChildren(el("p", "form-status error", error.message));
+    games.replaceChildren();
+    feedSidebar.replaceChildren(el("p", "form-status error", error.message));
+  }
+}
 
 function setReviewStatus(message, isError = false) {
   const status = $("comment-status");
@@ -464,7 +575,7 @@ async function loadReviews() {
   const list = $("review-list");
   list.replaceChildren(el("p", "review-meta", "Carregando avaliações…"));
   try {
-    const reviews = await window.GameboxApi.listReviews();
+    const reviews = await window.GameboxApi.listReviews($("review-sort").value);
     list.replaceChildren(...reviews.map(buildReview));
     if (reviews.length === 0) {
       list.append(el("p", "review-meta", "Ainda não há avaliações. Seja a primeira pessoa a avaliar um jogo."));
@@ -487,6 +598,7 @@ async function deleteReview(review) {
     if (editingReviewId === review.id) resetReviewForm();
     setReviewStatus("Avaliação excluída.");
     await loadReviews();
+    await loadActivities();
   } catch (error) {
     setReviewStatus(error.message, true);
   }
@@ -552,6 +664,7 @@ async function initReviewForm() {
     control.addEventListener("input", updateReviewSubmitState);
     control.addEventListener("change", updateReviewSubmitState);
   });
+  $("review-sort").addEventListener("change", loadReviews);
   starButtons.forEach(star => star.addEventListener("click", () => {
     const score = Number(star.dataset.score);
     starButtons.forEach(button => {
@@ -593,6 +706,7 @@ async function initReviewForm() {
       });
       setReviewStatus(wasEditing ? "Avaliação atualizada." : "Avaliação publicada.");
       await loadReviews();
+      await loadActivities();
     } catch (error) {
       setReviewStatus(error.message, true);
       updateReviewSubmitState();
@@ -604,6 +718,7 @@ async function initReviewForm() {
 /* ---------- 7. INICIALIZAÇÃO ---------- */
 lucide.createIcons(); // transforma os <i data-lucide="..."> do HTML em ícones
 buildPanels();
+loadActivities();
 initReviewForm().then(loadReviews);
 
 // Busca os jogos reais com debounce para reduzir chamadas e consumo da cota da API.
