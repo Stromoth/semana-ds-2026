@@ -75,7 +75,7 @@ app.get('/api/health', async (req, res) => {
     }
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use((req, res) => {
     res.status(404).json({
