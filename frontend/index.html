@@ -1,0 +1,224 @@
+<!doctype html>
+<!--
+  GAMEBOX — index.html (estrutura/conteúdo)
+
+  Arquivos ligados a este:
+    • css/style.css → toda a aparência (cores, tamanhos, responsivo)
+    • js/site-shell.js → cabeçalho e rodapé compartilhados pelas páginas
+    • js/main.js    → comportamento da descoberta (telas, filtros, busca, avaliações)
+
+  Como as partes se conectam (procure pelos comentários "↔" nos três arquivos):
+    • id="..."            → o JS encontra o elemento por esse id
+    • data-screen-target  → o JS troca de tela (discover/feed) ao clicar
+    • data-filter-panel   → o JS preenche as opções de filtro dentro dele
+    • class="..."         → o CSS estiliza; algumas classes o JS também cria/alterna
+    
+  O Tailwind (CDN) continua sendo usado só para utilitários rápidos (flex, gap, mt-3...).
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameBox · Descubra jogos</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet">
+  
+  <!-- ↔ CSS: aparência do site -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Bibliotecas externas: ícones (Lucide) e utilitários (Tailwind) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+</head>
+
+<body class="topline">
+  <div class="app-shell">
+
+    <!-- ================= TOPO ================= -->
+    <header class="topbar" data-site-header></header>
+
+    <main>
+
+      <!-- ================= TELA 1: DESCOBRIR ================= -->
+      <!-- ↔ JS (showScreen) liga/desliga a classe .active; ↔ CSS: .page-view -->
+      <section id="discover-view" class="page-view active" aria-label="Descoberta de jogos">
+
+        <!-- Barra de filtros. ↔ JS (buildPanels): cria as opções dentro de cada [data-filter-panel] -->
+        <div class="subbar">
+          <div class="site-width flex items-center gap-1 whitespace-nowrap">
+            <span class="section-kicker mr-2">NAVEGAR POR</span>
+
+            <div class="filter-menu-wrap">
+              <button id="filter-genre" class="filter-button" type="button" aria-label="Filtrar por gênero (pesquise um jogo primeiro)" aria-expanded="false" aria-haspopup="true" disabled>GÊNERO</button>
+              <div class="filter-popover" data-filter-panel="genre" role="group" aria-label="Opções de gênero" hidden></div>
+            </div>
+
+            <div class="filter-menu-wrap">
+              <button id="filter-platform" class="filter-button" type="button" aria-label="Filtrar por plataforma (pesquise um jogo primeiro)" aria-expanded="false" aria-haspopup="true" disabled>PLATAFORMA</button>
+              <div class="filter-popover" data-filter-panel="platform" role="group" aria-label="Opções de plataforma" hidden></div>
+            </div>
+
+            <!-- ↔ JS: pesquisa o catálogo GameBrain após dois caracteres -->
+            <label class="ml-auto search-wrap flex items-center gap-2 px-2 py-1.5 rounded-sm" for="game-search">
+              <i data-lucide="search" width="13" height="13" class="text-slate-400"></i>
+              <input id="game-search" type="search" autocomplete="off" placeholder="ENCONTRAR UM JOGO">
+            </label>
+          </div>
+          <p id="game-search-status" class="site-width api-search-status" role="status" aria-live="polite">Digite pelo menos 2 caracteres para pesquisar no catálogo GameBrain.</p>
+
+          <!-- ↔ JS (render): desenha aqui os "chips" dos filtros ativos -->
+          <div id="active-filter-chips" class="site-width flex flex-wrap gap-2 pb-2" aria-live="polite"></div>
+        </div>
+
+        <div class="site-width py-8">
+          <div class="flex items-end justify-between gap-3 mb-3">
+            <div>
+              <p class="section-kicker mb-1">CATÁLOGO GAMEBRAIN · JOGOS ADICIONADOS PELA COMUNIDADE</p>
+              <h1 class="section-title section-title--xl">BUSQUE SEU PRÓXIMO JOGO</h1>
+            </div>
+
+            <!-- ↔ JS (render): quantidade real de jogos da comunidade ou resultados da busca -->
+            <p id="filter-result" class="section-kicker" aria-live="polite"></p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- ↔ JS: setas do carrossel (página anterior/próxima) -->
+            <button id="carousel-prev" type="button" class="arrow shrink-0" aria-label="Ver jogos anteriores"><i data-lucide="chevron-left" width="18"></i></button>
+           
+            <!-- ↔ JS (render/makeCard): jogos da comunidade ou resultados reais da GameBrain -->
+            <div id="poster-grid" class="grid grid-cols-4 gap-3 flex-1 poster-grid"></div>
+           
+            <button id="carousel-next" type="button" class="arrow shrink-0" aria-label="Ver próximos jogos"><i data-lucide="chevron-right" width="18"></i></button>
+          </div>
+
+          <!-- ↔ JS (render): mostrado quando nenhum jogo combina com a busca/filtros -->
+          <div id="empty-search" class="empty-search"><span id="empty-search-text"></span><br><button type="button" id="clear-filters-empty" hidden>Limpar filtros</button></div>
+
+          <section class="promo mt-6" aria-label="Convite GameBox">
+            <div class="promo-content h-full px-6 py-5 flex items-center justify-between gap-5">
+              <div>
+                <p class="section-kicker promo-kicker mb-1">SEU DIÁRIO DE JOGOS</p>
+                <h2 class="promo-title">JOGUE, AVALIE, COMPARTILHE</h2>
+                <p class="promo-description">Descubra sua próxima campanha favorita e acompanhe tudo o que a comunidade está jogando.</p>
+              </div>
+             
+              <button class="orange-btn shrink-0" type="button" data-screen-target="feed">EXPLORAR JOGOS</button>
+            </div>
+          </section>
+        </div>
+
+        <section class="recent-strip py-5">
+          <div class="site-width grid grid-cols-[1fr_220px] gap-8 max-md:grid-cols-1">
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <h2 class="section-title section-title--lg">JOGOS COM ATIVIDADE RECENTE</h2>
+                
+                <span class="section-kicker">VER ATIVIDADE</span>
+              </div>
+              <div id="recent-activity-games" class="recent-activity-games" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
+              </div>
+            </div>
+           
+            <aside>
+              <h2 class="section-title section-title--lg mb-3">ATIVIDADE RECENTE</h2>
+              
+              <div id="network-activity-list" class="network-activity-list" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
+              </div>
+              <h2 class="section-title section-title--lg mt-6 mb-3">NA SUA REDE</h2>
+              <div id="network-following-activity" class="network-activity-list" aria-live="polite">
+                <p class="review-meta">Carregando atividade…</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= TELA 2: AVALIAÇÕES (FEED) ================= -->
+      <section id="feed-view" class="page-view" aria-label="Feed de avaliações">
+        <div class="site-width py-8">
+          <div class="flex items-end justify-between gap-4 border-b border-[#304b61] pb-4">
+            <div>
+              <p class="section-kicker mb-1">O QUE A COMUNIDADE ESTÁ JOGANDO</p>
+              <h1 class="section-title section-title--xl">AVALIAÇÕES RECENTES</h1>
+            </div>
+          
+            <div class="flex items-center gap-4">
+              <label class="section-kicker" for="review-sort">ORDENAR</label>
+              <select id="review-sort" class="review-sort" aria-label="Ordenar avaliações">
+                <option value="recent">MAIS RECENTES</option>
+                <option value="popular">MAIS POPULARES</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-[minmax(0,1fr)_255px] gap-10 mt-5 reviews-layout">
+            <section aria-label="Avaliações populares">
+
+              <p id="review-auth-notice" class="review-auth-notice" role="status" hidden></p>
+
+              <form id="comment-form" class="comment-box" aria-label="Adicionar avaliação" hidden>
+                <label id="review-form-heading" class="section-kicker block mb-2" for="comment-input">AVALIE UM JOGO DA SUA BIBLIOTECA</label>
+               
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                  <label class="sr-only" for="comment-game">Escolha um jogo da sua biblioteca</label>
+                  <select id="comment-game" class="w-full bg-[#0b1621] border border-[#2b455a] text-[#eaf1f5] p-2 text-xs" required>
+                    <option value="">Escolha um jogo da sua biblioteca</option>
+                  </select>
+                </div>
+               
+                <label class="sr-only" for="comment-input">Escreva sua avaliação</label>
+                <textarea id="comment-input" maxlength="2000" required placeholder="Escreva uma avaliação (até 2000 caracteres)..."></textarea>
+               
+                <div class="flex justify-between items-center gap-3 mt-2">
+                  <!-- ↔ JS: data-score guarda a nota (1 a 5); .selected é alternada pelo JS -->
+                  <div class="rating-picker" aria-label="Escolha uma avaliação de uma a cinco estrelas">
+                    <button type="button" data-score="1" aria-label="1 estrela">★</button><button type="button" data-score="2" aria-label="2 estrelas">★</button><button type="button" data-score="3" aria-label="3 estrelas">★</button><button type="button" data-score="4" aria-label="4 estrelas">★</button><button type="button" data-score="5" aria-label="5 estrelas">★</button>
+                  </div>
+                 
+                  <!-- ↔ JS: fica disabled até o formulário estar completo; ↔ CSS: .orange-btn:disabled -->
+                  <div class="flex gap-2">
+                    <button id="cancel-review-edit" class="filter-action" type="button" hidden>Cancelar</button>
+                    <button id="publish-button" class="orange-btn" type="submit" disabled>PUBLICAR AVALIAÇÃO</button>
+                  </div>
+                </div>
+               
+                <p id="comment-status" class="review-meta mt-2" aria-live="polite"></p>
+              </form>
+
+              <div id="review-list" class="review-scroll" tabindex="0" role="region" aria-label="Avaliações da comunidade"></div>
+             
+              <button type="button" class="orange-btn mt-7" data-screen-target="discover">VOLTAR À DESCOBERTA</button>
+            </section>
+
+            <aside class="side-column">
+              <section class="aside-panel">
+                <h2 class="section-title section-title--lg mb-3">ATIVIDADE RECENTE</h2>
+                <div id="feed-activity-list" class="network-activity-list" aria-live="polite">
+                  <p class="review-meta">Carregando atividade…</p>
+                </div>
+                <h2 class="section-title section-title--lg mt-6 mb-3">NA SUA REDE</h2>
+                <div id="feed-following-activity" class="network-activity-list" aria-live="polite">
+                  <p class="review-meta">Carregando atividade…</p>
+                </div>
+              </section>
+
+            </aside>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= RODAPÉ =================
+         ↔ CSS: .site-footer. O .app-shell é uma coluna com altura mínima da tela e o <main>
+         ocupa o espaço que sobra, então o rodapé sempre fica colado no fim da página. -->
+    <footer class="site-footer" data-site-footer></footer>
+  </div>
+
+  <!-- ↔ JS: carregado por último, quando todo o HTML acima já existe -->
+  <script src="js/site-shell.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
