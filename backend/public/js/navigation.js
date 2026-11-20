@@ -16,10 +16,16 @@
     libraryLink.hidden = !user;
     profileLink.hidden = !user;
     logoutButton.hidden = !user;
+    profileLink.classList.remove("active");
+    profileLink.removeAttribute("aria-current");
     if (user) {
       profileLink.href = `/pages/perfil.html?id=${encodeURIComponent(user.id)}`;
       if (window.location.pathname === "/pages/biblioteca.html") libraryLink.setAttribute("aria-current", "page");
-      if (window.location.pathname === "/pages/perfil.html") profileLink.setAttribute("aria-current", "page");
+      const viewedProfileId = new URLSearchParams(window.location.search).get("id");
+      if (window.location.pathname === "/pages/perfil.html" && viewedProfileId === String(user.id)) {
+        profileLink.classList.add("active");
+        profileLink.setAttribute("aria-current", "page");
+      }
     }
   }
 

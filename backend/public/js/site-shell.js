@@ -29,7 +29,7 @@
         <a class="nav-link" data-shell-register href="/pages/login.html?mode=register">CRIAR CONTA</a>
         <a class="nav-link" data-shell-login href="/pages/login.html">ENTRAR</a>
         <a class="nav-link${currentPath === "/pages/biblioteca.html" ? " active" : ""}" data-shell-library href="/pages/biblioteca.html" hidden>MINHA BIBLIOTECA</a>
-        <a class="nav-link${currentPath === "/pages/perfil.html" ? " active" : ""}" data-shell-profile href="#" hidden>MEU PERFIL</a>
+        <a class="nav-link" data-shell-profile href="#" hidden>MEU PERFIL</a>
         <button class="nav-link" data-shell-logout type="button" hidden>SAIR</button>
         <span class="account-status" data-shell-status role="status" aria-live="polite"></span>
         ${isHome ? `
